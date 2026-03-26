@@ -168,3 +168,9 @@ export const JsonIcon = ({ className = "", ...props }: IconProps) => (
     data_object
   </span>
 );
+
+export const EditNoteIcon = ({ className = "", ...props }: IconProps) => (
+  <span className={`material-symbols-outlined ${className}`} {...props}>
+    edit_note
+  </span>
+);

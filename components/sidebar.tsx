@@ -1,5 +1,6 @@
 // components/Sidebar.tsx
-import React from 'react';
+import React from "react";
+import Link from "next/link";
 import {
   DashboardIcon,
   QuizIcon,
@@ -8,8 +9,9 @@ import {
   AnalyticsIcon,
   AccountCircleIcon,
   SettingsIcon,
-  LogoutIcon
-} from './icons';
+  LogoutIcon,
+  EditNoteIcon,
+} from "./icons";
 
 export const Sidebar = () => {
   return (
@@ -24,29 +26,56 @@ export const Sidebar = () => {
       </div>
 
       <nav className="flex-1 flex flex-col gap-y-1">
-        {/* Active Link */}
-        <a className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-blue-700 dark:text-blue-400 font-bold border-r-4 border-blue-700 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/20 scale-[0.98] transition-transform" href="#">
+        {/* Dashboard Link */}
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        >
           <DashboardIcon />
           <span className="text-sm font-body">Dashboard</span>
-        </a>
-        
-        {/* Inactive Links */}
-        <a className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200" href="#">
+        </Link>
+
+        {/* Editor Link (Question Creator) */}
+        <Link
+          href="/editor"
+          className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-blue-700 dark:text-blue-400 font-bold border-r-4 border-blue-700 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/20 scale-[0.98] transition-transform"
+        >
+          <EditNoteIcon />
+          <span className="text-sm font-body">Question Editor</span>
+        </Link>
+
+        {/* Other Inactive Links */}
+        <Link
+          href="#"
+          className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        >
           <QuizIcon />
           <span className="text-sm font-body">Quiz</span>
-        </a>
-        <a className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200" href="#">
+        </Link>
+
+        <Link
+          href="#"
+          className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        >
           <HistoryIcon />
           <span className="text-sm font-body">History</span>
-        </a>
-        <a className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200" href="#">
+        </Link>
+
+        <Link
+          href="#"
+          className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        >
           <SettingsAppIcon />
           <span className="text-sm font-body">Management</span>
-        </a>
-        <a className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200" href="#">
+        </Link>
+
+        <Link
+          href="#"
+          className="flex items-center gap-x-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        >
           <AnalyticsIcon />
           <span className="text-sm font-body">Analytics</span>
-        </a>
+        </Link>
       </nav>
 
       <div className="mt-auto flex flex-col gap-y-1 pt-6 border-t border-outline-variant/10">
@@ -59,14 +88,22 @@ export const Sidebar = () => {
             <p className="text-[10px] text-secondary">Premium Plan</p>
           </div>
         </div>
-        <a className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-slate-500 font-medium hover:bg-slate-200/50 transition-all" href="#">
+
+        <Link
+          href="#"
+          className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-slate-500 font-medium hover:bg-slate-200/50 transition-all"
+        >
           <SettingsIcon className="text-sm" />
           <span className="text-xs font-body">Settings</span>
-        </a>
-        <a className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-error font-medium hover:bg-error-container/20 transition-all" href="#">
+        </Link>
+
+        <Link
+          href="#"
+          className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-error font-medium hover:bg-error-container/20 transition-all"
+        >
           <LogoutIcon className="text-sm" />
           <span className="text-xs font-body">Logout</span>
-        </a>
+        </Link>
       </div>
     </aside>
   );

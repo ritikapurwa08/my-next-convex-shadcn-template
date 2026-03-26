@@ -4,21 +4,22 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import "material-symbols/outlined.css";
-// 1. Inter Font Setup (आपके body और labels के लिए)
+
+// 1. Inter Font Setup (For body and labels)
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
 });
 
-// 2. Manrope Font Setup (आपकी headlines के लिए)
+// 2. Manrope Font Setup (For headlines)
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
   display: "swap",
 });
 
-// 3. Geist Mono Setup (यदि आपको मोनोस्पेस की आवश्यकता है)
+// 3. Geist Mono Setup (If monospace is required)
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -42,17 +43,12 @@ export default function RootLayout({
         "h-full",
         "antialiased",
         inter.variable,
-
-        "font-sans", // यह globals.css में इंटर को डिफ़ॉल्ट बनाएगा
+        manrope.variable, // Added: This was missing, causing Manrope to not load!
+        geistMono.variable,
       )}
     >
-      {/* <head> टैग में अब कोई बाहरी Google Fonts या Material Icons के <link> नहीं हैं */}
-      <body>
-        <ConvexClientProvider>
-          <main className="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed antialiased min-h-screen">
-            {children}
-          </main>
-        </ConvexClientProvider>
+      <body className="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen">
+        <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>
     </html>
   );
