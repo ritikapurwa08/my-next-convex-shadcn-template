@@ -294,7 +294,7 @@ export default function AdminPage() {
               onClick={handleGeneratePrompt}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface-container border border-outline-variant/20 text-sm font-bold text-on-surface hover:border-primary/30 transition-colors"
             >
-              <MaterialIcon name="generate" className="text-base" />
+              <MaterialIcon name="auto_awesome" className="text-base" />
               Generate Prompt for &quot;{topic}&quot;
             </button>
 
@@ -314,27 +314,6 @@ export default function AdminPage() {
                       className="text-sm text-secondary"
                     />
                   </button>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider">
-                    Paste AI output here
-                  </label>
-                  <textarea
-                    className="w-full bg-surface-container-lowest rounded-xl border border-outline-variant/20 outline-none p-4 min-h-[120px] text-sm font-mono text-on-surface resize-y"
-                    placeholder="Paste the JSON output from your AI tool…"
-                    value={aiOutput}
-                    onChange={(e) => setAiOutput(e.target.value)}
-                  />
-                  {aiOutput && (
-                    <button
-                      onClick={handlePasteAiOutput}
-                      className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary/10 text-primary border border-primary/20 text-sm font-bold hover:bg-primary/15 transition-colors"
-                    >
-                      <MaterialIcon name="arrow_upward" className="text-sm" />
-                      Move to JSON editor
-                    </button>
-                  )}
                 </div>
               </div>
             )}
