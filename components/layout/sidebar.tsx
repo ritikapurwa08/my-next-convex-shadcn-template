@@ -1,23 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { useQuery } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useState } from "react";
+import { api } from "@/convex/_generated/api";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { cn } from "@/lib/utils";
 
+const NAV_ITEMS = [
+  { name: "Dashboard", href: "/", icon: "dashboard" },
+  { name: "Quiz", href: "/quiz", icon: "quiz" },
+  { name: "History", href: "/history", icon: "history" },
+  { name: "Analytics", href: "/analytics", icon: "analytics" },
+];
+
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useAuthActions();
+  const user = useQuery(api.users.current);
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  const navItems = [
-    { name: "Dashboard", href: "/", icon: "dashboard" },
-    { name: "Quiz", href: "/quiz", icon: "quiz" },
-    { name: "History", href: "/history", icon: "history" },
-    { name: "Management", href: "/admin", icon: "settings_applications" },
-    { name: "Analytics", href: "/analytics", icon: "analytics" },
-  ];
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await signOut();
+    router.push("/sign-in");
+  };
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 border-r-0 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl flex flex-col py-8 px-4 gap-y-2 z-50">
+    <aside className="h-screen w-64 fixed left-0 top-0 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl flex flex-col py-8 px-4 gap-y-2 z-50">
+      {/* Logo */}
       <div className="mb-10 px-2">
         <h1 className="text-xl font-headline font-extrabold tracking-tight text-blue-800 dark:text-blue-300">
           The Exam Orbit
@@ -27,10 +42,10 @@ export default function Sidebar() {
         </p>
       </div>
 
+      {/* Nav */}
       <nav className="flex-1 flex flex-col gap-y-1">
-        {navItems.map((item) => {
+        {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href;
-
           return (
             <Link
               key={item.name}
@@ -47,30 +62,63 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
+        {/* Admin link — only visible to admins */}
+        {user?.role === "admin" && (
+          <Link
+            href="/admin"
+            className={cn(
+              "flex items-center gap-x-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200",
+              pathname === "/admin"
+                ? "text-blue-700 dark:text-blue-400 font-bold border-r-4 border-blue-700 bg-blue-50/50"
+                : "text-slate-500 hover:text-blue-600 hover:bg-slate-200/50",
+            )}
+          >
+            <MaterialIcon name="admin_panel_settings" />
+            <span className="text-sm font-body">Management</span>
+          </Link>
+        )}
       </nav>
 
+      {/* User profile + logout */}
       <div className="mt-auto flex flex-col gap-y-1 pt-6 border-t border-outline-variant/10">
         <div className="flex items-center gap-x-3 px-3 py-4 mb-2">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-            <MaterialIcon name="account_circle" />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-on-surface">Alex Rivera</p>
-            <p className="text-[10px] text-secondary">Premium Plan</p>
+          {user?.image ? (
+            <Image
+              src={user.image}
+              alt={user.name ?? "avatar"}
+              width={40}
+              height={40}
+              className="rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <MaterialIcon name="account_circle" />
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-on-surface truncate">
+              {user?.name ?? "Loading…"}
+            </p>
+            <p className="text-[10px] text-secondary capitalize">
+              {user?.role ?? "student"}
+            </p>
           </div>
         </div>
 
-        <Link
-          href="/settings"
-          className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-slate-500 font-medium hover:bg-slate-200/50 transition-all"
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-error font-medium hover:bg-error-container/20 transition-all w-full text-left disabled:opacity-60"
         >
-          <MaterialIcon name="settings" className="text-sm" />
-          <span className="text-xs font-body">Settings</span>
-        </Link>
-
-        <button className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-error font-medium hover:bg-error-container/20 transition-all w-full text-left">
-          <MaterialIcon name="logout" className="text-sm" />
-          <span className="text-xs font-body">Logout</span>
+          {loggingOut ? (
+            <span className="w-4 h-4 border-2 border-error border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <MaterialIcon name="logout" className="text-sm" />
+          )}
+          <span className="text-xs font-body">
+            {loggingOut ? "Logging out…" : "Logout"}
+          </span>
         </button>
       </div>
     </aside>

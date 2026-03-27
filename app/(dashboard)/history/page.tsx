@@ -1,153 +1,264 @@
+"use client";
+
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+const SUBJECTS = [
+  "All Subjects",
+  "Rajasthan History",
+  "Rajasthan Geography",
+  "Indian Polity",
+  "Art & Culture",
+  "Indian Geography",
+  "Psychology",
+];
+const TIME_FILTERS = [
+  { label: "All Time", value: undefined },
+  { label: "Today", value: "today" as const },
+  { label: "This Week", value: "week" as const },
+  { label: "This Month", value: "month" as const },
+];
 
 export default function HistoryPage() {
-  // Mock data to keep the JSX clean and scalable
-  const historyLogs = [
-    {
-      id: 1,
-      subject: "Indian Polity",
-      topic: "Constitutional Framework",
-      score: "48/50",
-      percentage: 96,
-      date: "Today, 10:30 AM",
-      status: "Excellent",
-      icon: "account_balance",
-      color: "primary",
-    },
-    {
-      id: 2,
-      subject: "Rajasthan Geography",
-      topic: "Aravalli Range & Climate",
-      score: "32/50",
-      percentage: 64,
-      date: "Yesterday, 4:15 PM",
-      status: "Needs Review",
-      icon: "landscape",
-      color: "tertiary",
-    },
-    {
-      id: 3,
-      subject: "Rajasthan History",
-      topic: "Mewar Dynasty",
-      score: "45/50",
-      percentage: 90,
-      date: "Oct 12, 2023",
-      status: "Good",
-      icon: "history_edu",
-      color: "secondary",
-    },
-  ];
+  const [selectedSubject, setSelectedSubject] = useState<string | undefined>(
+    undefined,
+  );
+  const [timeFilter, setTimeFilter] = useState<
+    "today" | "week" | "month" | undefined
+  >(undefined);
+
+  const records = useQuery(api.quizHistory.listByUser, {
+    subject: selectedSubject,
+    timeFilter,
+  });
+
+  const stats = useQuery(api.quizHistory.stats);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Header & Filters */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant/20 pb-6">
-        <div>
-          <h2 className="text-3xl font-headline font-bold text-on-surface tracking-tight">
-            Test History
-          </h2>
-          <p className="text-secondary font-body text-sm mt-2">
-            Review your past performance and identify areas for improvement.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-lowest text-on-surface font-body text-sm font-medium border border-outline-variant/20 hover:bg-surface-container transition-colors">
-            <MaterialIcon name="filter_list" className="text-sm" />
-            <span>Filter</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-lowest text-on-surface font-body text-sm font-medium border border-outline-variant/20 hover:bg-surface-container transition-colors">
-            <MaterialIcon name="sort" className="text-sm" />
-            <span>Subject A-Z</span>
-          </button>
-        </div>
+      {/* Header */}
+      <header className="border-b border-outline-variant/20 pb-6">
+        <h2 className="text-3xl font-headline font-bold text-on-surface tracking-tight">
+          Test History
+        </h2>
+        <p className="text-secondary font-body text-sm mt-1">
+          Review your past performance and identify areas for improvement.
+        </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Main Content - History List */}
-        <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-wider mb-4">
-            Recent Assessments
-          </h3>
+      {/* Stats row */}
+      {stats && (
+        <div className="grid grid-cols-3 gap-4">
+          <StatCard
+            icon="quiz"
+            label="Total Quizzes"
+            value={String(stats.totalQuizzes)}
+          />
+          <StatCard
+            icon="percent"
+            label="Avg Accuracy"
+            value={`${stats.avgAccuracy}%`}
+          />
+          <StatCard
+            icon="star"
+            label="Best Subject"
+            value={stats.bestSubject}
+            small
+          />
+        </div>
+      )}
 
-          {historyLogs.map((log) => (
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Time filter */}
+        <div className="flex gap-1.5 bg-surface-container rounded-xl p-1">
+          {TIME_FILTERS.map((f) => (
+            <button
+              key={f.label}
+              onClick={() => setTimeFilter(f.value)}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-bold transition-colors",
+                timeFilter === f.value
+                  ? "bg-surface-container-lowest text-primary shadow-sm"
+                  : "text-secondary hover:text-on-surface",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Subject filter */}
+        <div className="flex gap-1.5 flex-wrap">
+          {SUBJECTS.map((s) => {
+            const val = s === "All Subjects" ? undefined : s;
+            return (
+              <button
+                key={s}
+                onClick={() => setSelectedSubject(val)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors",
+                  selectedSubject === val
+                    ? "bg-primary/10 border-primary/30 text-primary"
+                    : "border-outline-variant/20 text-secondary hover:border-primary/20 hover:text-on-surface",
+                )}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Records list */}
+      <div className="space-y-3">
+        <h3 className="text-xs font-bold text-secondary uppercase tracking-widest">
+          Recent Assessments {records !== undefined && `(${records.length})`}
+        </h3>
+
+        {records === undefined && (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-20 bg-surface-container rounded-2xl animate-pulse"
+              />
+            ))}
+          </div>
+        )}
+
+        {records !== undefined && records.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <MaterialIcon
+              name="history"
+              className="text-5xl text-outline mb-4"
+            />
+            <p className="font-headline font-bold text-on-surface">
+              No records yet
+            </p>
+            <p className="text-sm text-secondary mt-1">
+              Complete a quiz to see your history here.
+            </p>
+          </div>
+        )}
+
+        {records?.map((record) => {
+          const isGood = record.accuracy >= 75;
+          const isMid = record.accuracy >= 50 && record.accuracy < 75;
+          const date = new Date(record.answeredAt);
+          const dateStr = date.toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+          const timeStr = date.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          return (
             <div
-              key={log.id}
+              key={record._id}
               className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:shadow-lg hover:border-primary/20 transition-all duration-300 gap-4"
             >
               <div className="flex items-center gap-4">
-                <div
-                  className={`w-12 h-12 rounded-xl bg-${log.color}/10 flex items-center justify-center text-${log.color} shrink-0`}
-                >
-                  <MaterialIcon name={log.icon} className="text-2xl" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                  <MaterialIcon name="history_edu" className="text-2xl" />
                 </div>
                 <div>
                   <h4 className="font-headline font-bold text-on-surface text-base">
-                    {log.subject}
+                    {record.subject}
                   </h4>
                   <p className="text-xs text-secondary font-body mt-0.5">
-                    {log.topic} • {log.date}
+                    {record.topic} · {dateStr}, {timeStr}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-6 sm:justify-end">
-                <div className="text-right">
-                  <p className="font-headline font-extrabold text-lg text-on-surface">
-                    {log.score}
-                  </p>
-                  <p
-                    className={`text-[10px] font-bold uppercase tracking-wider ${log.percentage >= 80 ? "text-primary" : log.percentage >= 60 ? "text-tertiary" : "text-error"}`}
-                  >
-                    {log.status}
+                {/* Mini accuracy bar */}
+                <div className="hidden sm:block w-24">
+                  <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-full rounded-full",
+                        isGood
+                          ? "bg-primary"
+                          : isMid
+                            ? "bg-amber-500"
+                            : "bg-error",
+                      )}
+                      style={{ width: `${record.accuracy}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-secondary mt-1 text-right">
+                    {record.accuracy}%
                   </p>
                 </div>
-                <button className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-colors">
-                  <MaterialIcon name="arrow_forward_ios" className="text-sm" />
-                </button>
+
+                <div className="text-right">
+                  <p className="font-headline font-extrabold text-lg text-on-surface">
+                    {record.score}/{record.totalQuestions}
+                  </p>
+                  <p
+                    className={cn(
+                      "text-[10px] font-bold uppercase tracking-wider",
+                      isGood
+                        ? "text-primary"
+                        : isMid
+                          ? "text-amber-600"
+                          : "text-error",
+                    )}
+                  >
+                    {isGood ? "Excellent" : isMid ? "Needs Review" : "Poor"}
+                  </p>
+                </div>
+
+                <div className="text-right text-xs text-secondary">
+                  <MaterialIcon name="timer" className="text-sm mr-1" />
+                  {Math.floor(record.timeTaken / 60)}m {record.timeTaken % 60}s
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Right Column - AI Recommendations */}
-        <div className="space-y-6">
-          {/* Quick Insight Bento Card */}
-          <div className="bg-primary rounded-2xl p-6 text-on-primary relative overflow-hidden group shadow-xl shadow-primary/10">
-            <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary-container opacity-20 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
-
-            <div className="flex items-center gap-2 mb-4 relative z-10">
-              <MaterialIcon
-                name="tips_and_updates"
-                className="text-tertiary-fixed"
-              />
-              <h4 className="font-headline font-bold text-sm">
-                Focus Recommendation
-              </h4>
-            </div>
-
-            <p className="font-body text-xs text-on-primary/90 leading-relaxed mb-6 relative z-10">
-              Based on your history, you excel in Indian Polity but could spend
-              more time reviewing unit 4 of Rajasthan Geography.
-            </p>
-
-            <button className="w-full py-3 bg-white text-primary font-bold text-xs rounded-xl active:scale-95 transition-transform relative z-10 hover:bg-opacity-90">
-              Start Targeted Quiz
-            </button>
-          </div>
-
-          {/* Info Alert */}
-          <div className="p-4 bg-tertiary-container/10 rounded-xl border border-tertiary-container/20">
-            <div className="flex gap-3 text-tertiary">
-              <MaterialIcon name="info" className="text-lg shrink-0" />
-              <p className="text-xs font-body leading-relaxed">
-                <span className="font-bold">Did you know?</span> Reviewing
-                marked questions within 24 hours increases retention by 40%.
-              </p>
-            </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
+    </div>
+  );
+}
+
+function StatCard({
+  icon,
+  label,
+  value,
+  small,
+}: {
+  icon: string;
+  label: string;
+  value: string;
+  small?: boolean;
+}) {
+  return (
+    <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+          <MaterialIcon name={icon} className="text-base" />
+        </div>
+        <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">
+          {label}
+        </span>
+      </div>
+      <p
+        className={cn(
+          "font-headline font-extrabold text-on-surface",
+          small ? "text-base" : "text-3xl",
+        )}
+      >
+        {value}
+      </p>
     </div>
   );
 }
