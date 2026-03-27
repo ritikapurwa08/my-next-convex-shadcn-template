@@ -2,14 +2,8 @@
 
 import * as React from "react";
 import Image, { StaticImageData } from "next/image";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { cn } from "@/lib/utils";
 
 type AvatarPickerProps = {
@@ -18,69 +12,90 @@ type AvatarPickerProps = {
   onChange: (value: StaticImageData) => void;
 };
 
-const AvatarPicker: React.FC<AvatarPickerProps> = ({
-  images,
-  value,
-  onChange,
-}) => {
+// ── Named export (used in sign-up page) ───────────────────────────────────
+export function AvatarPickerDialog({ images, value, onChange }: AvatarPickerProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleSelect = (img: StaticImageData) => {
     onChange(img);
-    setOpen(false); // dialog close
+    setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {/* 🔵 Trigger (Circular Avatar) */}
       <DialogTrigger asChild>
-        <div className="cursor-pointer flex flex-col items-center gap-2">
-          <Avatar className="w-20 h-20 border-2 border-primary">
-            {value ? (
-              <AvatarImage src={value.src} />
-            ) : (
-              <AvatarFallback>+</AvatarFallback>
-            )}
-          </Avatar>
-          <p className="text-sm text-muted-foreground">Select Avatar</p>
-        </div>
+        <button
+          type="button"
+          className="group flex flex-col items-center gap-2 focus:outline-none"
+          aria-label="Select avatar"
+        >
+          {/* Avatar circle */}
+          <div className="relative">
+            <div className={cn(
+              "w-20 h-20 rounded-full border-2 overflow-hidden flex items-center justify-center transition-all",
+              value
+                ? "border-primary shadow-lg shadow-primary/20"
+                : "border-dashed border-outline-variant bg-surface-container"
+            )}>
+              {value ? (
+                <Image src={value} alt="Selected avatar" width={80} height={80} className="object-cover w-full h-full" />
+              ) : (
+                <MaterialIcon name="add_a_photo" className="text-2xl text-outline" />
+              )}
+            </div>
+            {/* Edit badge */}
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+              <MaterialIcon name="edit" className="text-white text-xs" />
+            </div>
+          </div>
+          <span className="text-xs font-semibold text-secondary group-hover:text-primary transition-colors">
+            {value ? "Change Avatar" : "Select Avatar"}
+          </span>
+        </button>
       </DialogTrigger>
 
-      {/* 📦 Dialog Content */}
-      <DialogContent className="min-w-3xl bg-white w-3xl flex flex-col">
-        <DialogTitle className="text-lg font-semibold mb-4">
-          Choose your avatar
+      <DialogContent className="max-w-2xl bg-surface-container-lowest rounded-3xl border border-outline-variant/20 p-6">
+        <DialogTitle className="font-headline font-bold text-on-surface text-lg mb-4">
+          Choose Your Avatar
         </DialogTitle>
 
-        <div className="grid grid-cols-5 gap-4  max-h-[400px] overflow-y-auto">
+        <div className="grid grid-cols-5 sm:grid-cols-6 gap-3 max-h-[420px] overflow-y-auto pr-1">
           {images.map((img, index) => {
             const isSelected = value?.src === img.src;
-
             return (
-              <Card
+              <button
                 key={index}
+                type="button"
                 onClick={() => handleSelect(img)}
                 className={cn(
-                  "cursor-pointer min-w-40 min-h-40 p-2 rounded-xl border-2 transition-all",
+                  "relative rounded-xl overflow-hidden aspect-square transition-all focus:outline-none",
                   isSelected
-                    ? "border-primary scale-105"
-                    : "border-transparent hover:border-gray-300",
+                    ? "ring-2 ring-primary ring-offset-2 scale-105 shadow-md shadow-primary/20"
+                    : "hover:scale-105 hover:ring-2 hover:ring-outline-variant"
                 )}
+                aria-label={`Avatar option ${index + 1}`}
+                aria-pressed={isSelected}
               >
                 <Image
                   src={img}
-                  alt={`avatar-${index}`}
-                  width={200}
-                  height={200}
-                  className="rounded-lg object-cover"
+                  alt={`Avatar ${index + 1}`}
+                  width={100}
+                  height={100}
+                  className="w-full h-full object-cover"
                 />
-              </Card>
+                {isSelected && (
+                  <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                    <MaterialIcon name="check_circle" className="text-white text-xl" style={{ fontVariationSettings: "'FILL' 1" }} />
+                  </div>
+                )}
+              </button>
             );
           })}
         </div>
       </DialogContent>
     </Dialog>
   );
-};
+}
 
-export default AvatarPicker;
+// ── Default export (backward-compat for any legacy imports) ───────────────
+export default AvatarPickerDialog;

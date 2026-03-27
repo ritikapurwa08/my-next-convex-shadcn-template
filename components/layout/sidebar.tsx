@@ -62,20 +62,22 @@ export default function Sidebar() {
           );
         })}
 
-        {/* Admin link — only visible to admins */}
+        {/* Admin links — only visible to admins */}
         {user?.role === "admin" && (
-          <Link
-            href="/admin"
-            className={cn(
-              "flex items-center gap-x-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200",
-              pathname === "/admin"
-                ? "text-blue-700 dark:text-blue-400 font-bold border-r-4 border-blue-700 bg-blue-50/50"
-                : "text-slate-500 hover:text-blue-600 hover:bg-slate-200/50",
-            )}
-          >
-            <MaterialIcon name="admin_panel_settings" />
-            <span className="text-sm font-body">Management</span>
-          </Link>
+          <>
+            <Link
+              href="/admin/questions"
+              className={cn(
+                "flex items-center gap-x-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200",
+                pathname === "/admin/questions"
+                  ? "text-blue-700 dark:text-blue-400 font-bold border-r-4 border-blue-700 bg-blue-50/50"
+                  : "text-slate-500 hover:text-blue-600 hover:bg-slate-200/50",
+              )}
+            >
+              <MaterialIcon name="quiz" />
+              <span className="text-sm font-body">Quiz Questions</span>
+            </Link>
+          </>
         )}
       </nav>
 

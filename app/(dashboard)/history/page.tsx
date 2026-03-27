@@ -3,8 +3,9 @@
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
 
 const SUBJECTS = [
   "All Subjects",
@@ -36,6 +37,20 @@ export default function HistoryPage() {
   });
 
   const stats = useQuery(api.quizHistory.stats);
+
+  const chartData = useMemo(() => {
+    if (!records) return [];
+    // Reverse to show chronological order left-to-right
+    return [...records].reverse().map((r, i) => ({
+      name: `Q${i + 1}`,
+      fullSubject: r.subject,
+      topic: r.topic,
+      accuracy: r.accuracy,
+      score: r.score,
+      total: r.totalQuestions,
+      date: new Date(r.answeredAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+    }));
+  }, [records]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -142,6 +157,54 @@ export default function HistoryPage() {
             <p className="text-sm text-secondary mt-1">
               Complete a quiz to see your history here.
             </p>
+          </div>
+        )}
+
+        {records && records.length > 0 && (
+          <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 mb-8 max-w-full">
+            <div className="flex items-center gap-2 mb-6">
+              <MaterialIcon name="monitoring" className="text-primary text-xl" />
+              <h3 className="font-headline font-bold text-lg text-on-surface">Accuracy Trend</h3>
+            </div>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" opacity={0.4} />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} dy={10} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} domain={[0, 100]} />
+                  <Tooltip
+                    cursor={{ fill: "#f3f4f6" }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-surface-container-lowest p-3 border border-outline-variant/20 rounded-xl shadow-lg">
+                            <p className="font-bold text-sm text-on-surface">{data.fullSubject}</p>
+                            <p className="text-[10px] text-secondary mb-2">{data.topic} • {data.date}</p>
+                            <div className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-primary" />
+                              <span className="text-xs font-semibold">Accuracy: {data.accuracy}%</span>
+                            </div>
+                            <p className="text-[10px] text-secondary mt-1 pl-4">Score: {data.score}/{data.total}</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar dataKey="accuracy" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                    {chartData.map((entry, index) => {
+                      return (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.accuracy >= 75 ? "#10b981" : entry.accuracy >= 50 ? "#f59e0b" : "#ef4444"} 
+                        />
+                      );
+                    })}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         )}
 

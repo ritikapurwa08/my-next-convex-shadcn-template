@@ -1,0 +1,242 @@
+[
+  {
+    "id": "lt1",
+    "question": "Who is considered the founder of the Trial and Error theory of learning?",
+    "options": [
+      "Ivan Pavlov",
+      "Edward Thorndike",
+      "B.F. Skinner",
+      "Jean Piaget"
+    ],
+    "correctAnswer": "Edward Thorndike",
+    "explanation": "Edward Thorndike developed the Trial and Error theory through experiments on animals like cats. He demonstrated that learning occurs gradually through repeated attempts and elimination of errors, leading to the formation of stimulus-response connections, which became foundational in behaviorist learning theories."
+  },
+  {
+    "id": "lt2",
+    "question": "Which principle states that responses followed by satisfaction are strengthened?",
+    "options": [
+      "Law of Readiness",
+      "Law of Effect",
+      "Law of Exercise",
+      "Law of Reinforcement"
+    ],
+    "correctAnswer": "Law of Effect",
+    "explanation": "The Law of Effect, proposed by Thorndike, states that responses followed by satisfying consequences are more likely to be repeated. This principle highlights the importance of outcomes in strengthening learning and plays a crucial role in reinforcement-based learning models."
+  },
+  {
+    "id": "lt3",
+    "question": "Classical conditioning is primarily associated with which psychologist?",
+    "options": [
+      "B.F. Skinner",
+      "Ivan Pavlov",
+      "Edward Tolman",
+      "Albert Bandura"
+    ],
+    "correctAnswer": "Ivan Pavlov",
+    "explanation": "Ivan Pavlov introduced classical conditioning through his experiments with dogs. He showed how a neutral stimulus, when paired repeatedly with an unconditioned stimulus, could evoke a conditioned response, establishing the foundation of stimulus-based associative learning."
+  },
+  {
+    "id": "lt4",
+    "question": "In classical conditioning, what is a conditioned stimulus?",
+    "options": [
+      "A natural response",
+      "A neutral stimulus that acquires meaning",
+      "An automatic reaction",
+      "A biological trigger"
+    ],
+    "correctAnswer": "A neutral stimulus that acquires meaning",
+    "explanation": "A conditioned stimulus is initially neutral but becomes capable of eliciting a response after being paired with an unconditioned stimulus. Over time, it triggers a conditioned response independently, demonstrating learned associations between stimuli in classical conditioning."
+  },
+  {
+    "id": "lt5",
+    "question": "Operant conditioning emphasizes the role of what in learning?",
+    "options": [
+      "Stimulus pairing",
+      "Cognitive restructuring",
+      "Reinforcement and consequences",
+      "Genetic factors"
+    ],
+    "correctAnswer": "Reinforcement and consequences",
+    "explanation": "Operant conditioning, proposed by B.F. Skinner, focuses on how consequences shape behavior. Positive reinforcement increases behavior frequency, while punishment reduces it. Learning occurs through voluntary responses influenced by rewards and penalties in the environment."
+  },
+  {
+    "id": "lt6",
+    "question": "Which type of reinforcement increases behavior by removing an unpleasant stimulus?",
+    "options": [
+      "Positive reinforcement",
+      "Negative reinforcement",
+      "Punishment",
+      "Extinction"
+    ],
+    "correctAnswer": "Negative reinforcement",
+    "explanation": "Negative reinforcement strengthens behavior by removing an unpleasant stimulus after a response. For example, stopping a loud noise when a correct action is performed increases the likelihood of repeating that behavior, reinforcing learning through relief from discomfort."
+  },
+  {
+    "id": "lt7",
+    "question": "Which psychologist is associated with Social Learning Theory?",
+    "options": [
+      "Jean Piaget",
+      "Albert Bandura",
+      "Ivan Pavlov",
+      "Clark Hull"
+    ],
+    "correctAnswer": "Albert Bandura",
+    "explanation": "Albert Bandura proposed Social Learning Theory, emphasizing that learning occurs through observation, imitation, and modeling. His Bobo doll experiment demonstrated that individuals, especially children, learn behaviors by observing others, even without direct reinforcement."
+  },
+  {
+    "id": "lt8",
+    "question": "What is the key concept in Bandura’s observational learning?",
+    "options": [
+      "Reinforcement only",
+      "Trial and error",
+      "Modeling",
+      "Conditioning"
+    ],
+    "correctAnswer": "Modeling",
+    "explanation": "Modeling is central to Bandura’s theory, where individuals learn by observing others’ behaviors and outcomes. This process involves attention, retention, reproduction, and motivation, allowing learners to acquire new behaviors without direct experience."
+  },
+  {
+    "id": "lt9",
+    "question": "Which theory focuses on internal mental processes like thinking and memory?",
+    "options": [
+      "Behaviorism",
+      "Cognitivism",
+      "Humanism",
+      "Psychoanalysis"
+    ],
+    "correctAnswer": "Cognitivism",
+    "explanation": "Cognitivism emphasizes mental processes such as perception, memory, and problem-solving. Unlike behaviorism, it considers the learner as an active participant who processes information, making it essential for understanding higher-order thinking and learning mechanisms."
+  },
+  {
+    "id": "lt10",
+    "question": "Jean Piaget is best known for which theory?",
+    "options": [
+      "Operant Conditioning",
+      "Cognitive Development Theory",
+      "Classical Conditioning",
+      "Drive Reduction Theory"
+    ],
+    "correctAnswer": "Cognitive Development Theory",
+    "explanation": "Jean Piaget developed the Cognitive Development Theory, explaining how children actively construct knowledge through stages. His theory highlights processes like assimilation and accommodation, showing that learning evolves as cognitive structures mature over time."
+  },
+  {
+    "id": "lt11",
+    "question": "Which concept refers to learning that is not immediately demonstrated?",
+    "options": [
+      "Observational learning",
+      "Latent learning",
+      "Insight learning",
+      "Conditioned learning"
+    ],
+    "correctAnswer": "Latent learning",
+    "explanation": "Latent learning, proposed by Edward Tolman, refers to knowledge acquired without immediate reinforcement or observable behavior. It becomes evident only when there is motivation or need, indicating that learning can occur without direct performance."
+  },
+  {
+    "id": "lt12",
+    "question": "Which psychologist introduced Insight Learning?",
+    "options": [
+      "Wolfgang Kohler",
+      "Thorndike",
+      "Skinner",
+      "Watson"
+    ],
+    "correctAnswer": "Wolfgang Kohler",
+    "explanation": "Wolfgang Kohler, a Gestalt psychologist, introduced Insight Learning through experiments with chimpanzees. He showed that learning can occur suddenly through understanding relationships, rather than gradual trial and error, emphasizing cognitive restructuring."
+  },
+  {
+    "id": "lt13",
+    "question": "What does ‘Zone of Proximal Development’ refer to?",
+    "options": [
+      "What a child already knows",
+      "What a child cannot learn",
+      "Potential learning with guidance",
+      "Biological maturation level"
+    ],
+    "correctAnswer": "Potential learning with guidance",
+    "explanation": "Proposed by Lev Vygotsky, the Zone of Proximal Development refers to tasks a learner can perform with assistance but not independently. It highlights the importance of social interaction and guidance in cognitive development and learning progression."
+  },
+  {
+    "id": "lt14",
+    "question": "Which theory emphasizes learning through reinforcement schedules?",
+    "options": [
+      "Classical Conditioning",
+      "Operant Conditioning",
+      "Cognitive Theory",
+      "Humanistic Theory"
+    ],
+    "correctAnswer": "Operant Conditioning",
+    "explanation": "Operant Conditioning emphasizes reinforcement schedules, such as fixed or variable intervals, to shape behavior. Skinner demonstrated that patterns of reinforcement influence how frequently and persistently behaviors are performed."
+  },
+  {
+    "id": "lt15",
+    "question": "Which learning theory focuses on holistic perception?",
+    "options": [
+      "Behaviorism",
+      "Gestalt Theory",
+      "Cognitivism",
+      "Constructivism"
+    ],
+    "correctAnswer": "Gestalt Theory",
+    "explanation": "Gestalt Theory emphasizes that learning involves perceiving patterns and wholes rather than isolated elements. It suggests that understanding relationships between parts leads to insight, making learning more meaningful and effective."
+  },
+  {
+    "id": "lt16",
+    "question": "Who proposed the Drive Reduction Theory?",
+    "options": [
+      "Clark Hull",
+      "Skinner",
+      "Pavlov",
+      "Bandura"
+    ],
+    "correctAnswer": "Clark Hull",
+    "explanation": "Clark Hull’s Drive Reduction Theory suggests that learning occurs to reduce biological drives or needs. Behaviors that satisfy needs are reinforced, making them more likely to be repeated, linking motivation directly with learning processes."
+  },
+  {
+    "id": "lt17",
+    "question": "Which learning theory emphasizes self-actualization?",
+    "options": [
+      "Behaviorism",
+      "Humanism",
+      "Cognitivism",
+      "Psychoanalysis"
+    ],
+    "correctAnswer": "Humanism",
+    "explanation": "Humanistic learning theory, associated with Abraham Maslow and Carl Rogers, focuses on personal growth and self-actualization. It views learners as inherently motivated and emphasizes emotional well-being, autonomy, and meaningful learning experiences."
+  },
+  {
+    "id": "lt18",
+    "question": "Which concept involves strengthening behavior through rewards?",
+    "options": [
+      "Punishment",
+      "Reinforcement",
+      "Extinction",
+      "Generalization"
+    ],
+    "correctAnswer": "Reinforcement",
+    "explanation": "Reinforcement is the process of increasing the likelihood of a behavior by following it with a reward or positive outcome. It is a key concept in behaviorist theories, particularly in operant conditioning, influencing learning efficiency."
+  },
+  {
+    "id": "lt19",
+    "question": "What is ‘extinction’ in learning theory?",
+    "options": [
+      "Strengthening behavior",
+      "Eliminating reinforcement",
+      "Replacing behavior",
+      "Creating habits"
+    ],
+    "correctAnswer": "Eliminating reinforcement",
+    "explanation": "Extinction occurs when reinforcement is removed, leading to a gradual decrease in the learned behavior. In both classical and operant conditioning, behaviors weaken and eventually disappear when they are no longer reinforced."
+  },
+  {
+    "id": "lt20",
+    "question": "Which theory suggests learning as a process of constructing knowledge?",
+    "options": [
+      "Behaviorism",
+      "Constructivism",
+      "Psychoanalysis",
+      "Functionalism"
+    ],
+    "correctAnswer": "Constructivism",
+    "explanation": "Constructivism, supported by Piaget and Vygotsky, views learning as an active process where learners construct knowledge based on experiences. It emphasizes interaction, prior knowledge, and social context in shaping understanding and meaning."
+  }
+]
