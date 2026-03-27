@@ -166,8 +166,8 @@ export default function HistoryPage() {
               <MaterialIcon name="monitoring" className="text-primary text-xl" />
               <h3 className="font-headline font-bold text-lg text-on-surface">Accuracy Trend</h3>
             </div>
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="h-64 w-full min-w-0">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" opacity={0.4} />
                   <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} dy={10} />

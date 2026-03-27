@@ -220,7 +220,7 @@ export default function QuestionsAdminPage() {
   };
 
   // ── Save ─────────────────────────────────────────────────────────────
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!parseSuccess) { handleValidate(); return; }
     setSaving(true); setSaveMsg(null);
     try {
@@ -233,14 +233,38 @@ export default function QuestionsAdminPage() {
         question: q.question,
         options: q.options as [string, string, string, string],
         answer: (q.correctAnswer ?? q.answer) as string,
-        ...(q.explanation ? { explanation: q.explanation } : {}),
+        explanation: q.explanation || "No explanation provided.",
       }));
+
+      // 1. Save locally via API (to your data/ folder)
+      const res = await fetch("/api/save-quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: toSlug(subject),
+          topic: toSlug(topic) || "topic",
+          setName: toSlug(setName.trim()),
+          questions: withMeta.map((q) => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.answer,
+            explanation: q.explanation,
+          })),
+        }),
+      });
+
+      const apiData = await res.json();
+      if (!res.ok) throw new Error(apiData.error || "Local API save failed");
+
+      // 2. Save to localStorage for browser view
       const existing: QuizQuestion[] = JSON.parse(localStorage.getItem("quiz_questions") || "[]");
       localStorage.setItem("quiz_questions", JSON.stringify([...existing, ...withMeta]));
-      setSaveMsg({ type: "ok", text: `✓ ${withMeta.length} question${withMeta.length !== 1 ? "s" : ""} saved to "${subject} → ${topic} → ${setName.trim()}"` });
+      
+      setSaveMsg({ type: "ok", text: `✓ ${withMeta.length} question(s) saved to localStorage and local data folder.` });
       setJsonInput(""); setParseSuccess(false); setSetName(""); loadStored();
-    } catch {
-      setSaveMsg({ type: "error", text: "Failed to save. Please re-validate." });
+    } catch (e) {
+      setSaveMsg({ type: "error", text: (e as Error).message || "Failed to save. Please re-validate." });
     } finally { setSaving(false); }
   };
 

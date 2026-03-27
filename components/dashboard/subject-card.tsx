@@ -12,7 +12,7 @@ export function SubjectCard({ title, icon }: SubjectCardProps) {
   const router = useRouter();
 
   const handleStartQuiz = () => {
-    const slug = title.toLowerCase().trim().replace(/\s+/g, "-");
+    const slug = title.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     router.push(`/quiz/${slug}`);
   };
 

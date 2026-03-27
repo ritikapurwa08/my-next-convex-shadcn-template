@@ -1,32 +1,52 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { SubjectCard } from "@/components/dashboard/subject-card";
+import Image from "next/image";
+
+const defaultSubjects = [
+  { title: "Rajasthan History", icon: "history_edu" },
+  { title: "Art & Culture", icon: "palette" },
+  { title: "Rajasthan Geography", icon: "landscape" },
+  { title: "Indian Polity", icon: "account_balance" },
+  { title: "Indian Geography", icon: "map" },
+  { title: "Psychology", icon: "psychology" },
+];
 
 export default function DashboardPage() {
-  const subjects = [
-    {
-      title: "Rajasthan History",
-      icon: "history_edu",
-    },
-    {
-      title: "Art & Culture",
-      icon: "palette",
-    },
-    {
-      title: "Rajasthan Geography",
-      icon: "landscape",
-    },
-    {
-      title: "Indian Polity",
-      icon: "account_balance",
-    },
-    {
-      title: "Indian Geography",
-      icon: "map",
-    },
-    {
-      title: "Psychology",
-      icon: "psychology",
-    },
-  ];
+  const [subjects, setSubjects] =
+    useState<{ title: string; icon: string }[]>(defaultSubjects);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const allStr = localStorage.getItem("quiz_questions") || "[]";
+        const all = JSON.parse(allStr);
+        const storedSubjects = [
+          ...new Set(all.map((q: { subject: string }) => q.subject)),
+        ] as string[];
+        const newSubjects = storedSubjects.filter(
+          (s: string) =>
+            !defaultSubjects.some(
+              (d) => d.title.toLowerCase() === s.toLowerCase(),
+            ),
+        );
+
+        if (newSubjects.length > 0) {
+          const dynamicCards = newSubjects.map((s: string) => ({
+            title: s,
+            icon: "folder", // Default icon for custom subjects
+          }));
+          setTimeout(
+            () => setSubjects([...defaultSubjects, ...dynamicCards]),
+            0,
+          );
+        }
+      } catch (e) {
+        console.error("Failed to parse custom subjects", e);
+      }
+    }
+  }, []);
 
   return (
     <>
@@ -58,8 +78,10 @@ export default function DashboardPage() {
       <section className="mt-12 overflow-hidden rounded-xl bg-primary relative h-48 flex items-center px-12">
         <div className="absolute right-0 top-0 h-full w-1/2 opacity-20 pointer-events-none overflow-hidden">
           {/* Using a standard img tag here to avoid next/image domain config issues for now */}
-          <img
+          <Image
             alt="Library Books"
+            width={100}
+            height={100}
             className="object-cover w-full h-full grayscale mix-blend-overlay"
             src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop"
           />

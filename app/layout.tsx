@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter, Manrope } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ConvexClientProvider } from "./ConvexClientProvider";
@@ -26,6 +27,14 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+// 4. Utsaah Font Setup (Local font for Hindi text)
+const utsaah = localFont({
+  src: "../public/font/utsaah/utsaah.ttf",
+  variable: "--font-utsaah",
+  display: "swap",
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "The Exam Orbit - Dashboard",
   description: "Academic Test Practice Platform",
@@ -45,6 +54,7 @@ export default function RootLayout({
         inter.variable,
         manrope.variable, // Added: This was missing, causing Manrope to not load!
         geistMono.variable,
+        utsaah.variable
       )}
     >
       <body className="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen">
