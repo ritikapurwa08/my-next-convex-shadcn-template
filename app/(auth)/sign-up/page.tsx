@@ -1,9 +1,16 @@
+"use client";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/ui/material-icon";
 
+import { useState } from "react";
+import { profileImages } from "@/components/profile/profile-images";
+import { StaticImageData } from "next/image";
+import AvatarPicker from "@/components/profile/avatar-selector";
+
 export default function SignUpPage() {
+  const [avatar, setAvatar] = useState<StaticImageData | undefined>();
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row overflow-hidden bg-surface">
+    <main className="min-h-screen min-w-full flex flex-row overflow-hidden bg-surface">
       {/* Left Side: Functional Sign Up Form (Exactly 50%) */}
       <section className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 lg:p-24 bg-surface-container-lowest relative z-10">
         <div className="w-full max-w-md space-y-10">
@@ -30,7 +37,11 @@ export default function SignUpPage() {
               Begin your academic journey with us today.
             </p>
           </div>
-
+          <AvatarPicker
+            images={profileImages}
+            value={avatar}
+            onChange={setAvatar}
+          />
           {/* Form */}
           <form className="space-y-6">
             <div className="space-y-4">
