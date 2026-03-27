@@ -1,0 +1,122 @@
+[
+  {
+    "id": "thar-1",
+    "question": "Which district in Rajasthan receives the least rainfall and is part of the Thar Desert?",
+    "options": [
+      "Jaisalmer",
+      "Udaipur",
+      "Kota",
+      "Banswara"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Jaisalmer is located in the core region of the Thar Desert and receives extremely low rainfall, often less than 20 cm annually. Its arid climate, sandy terrain, and sparse vegetation make it one of the driest districts in Rajasthan."
+  },
+  {
+    "id": "thar-2",
+    "question": "What type of soil is predominantly found in the Thar Desert?",
+    "options": [
+      "Alluvial soil",
+      "Black soil",
+      "Sandy soil",
+      "Red soil"
+    ],
+    "correctAnswer": "C",
+    "explanation": "The Thar Desert is mainly covered with sandy soil, which is loose, porous, and lacks moisture retention capacity. This soil type is formed due to wind deposition and is unsuitable for most crops without irrigation support."
+  },
+  {
+    "id": "thar-3",
+    "question": "Which river is known as the only major river flowing through the Thar Desert?",
+    "options": [
+      "Luni River",
+      "Chambal River",
+      "Banas River",
+      "Mahi River"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Luni River originates in the Aravalli Range and flows through the Thar Desert. It is the only significant river in this region, although it is mostly seasonal and becomes saline as it moves toward the Rann of Kutch."
+  },
+  {
+    "id": "thar-4",
+    "question": "What is the main reason for the formation of sand dunes in the Thar Desert?",
+    "options": [
+      "Water erosion",
+      "Glacial activity",
+      "Wind deposition",
+      "Volcanic activity"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Sand dunes in the Thar Desert are primarily formed due to wind deposition. Strong winds transport sand particles and deposit them in heaps, forming various types of dunes such as barchans and longitudinal dunes across the desert landscape."
+  },
+  {
+    "id": "thar-5",
+    "question": "Which of the following vegetation types is commonly found in the Thar Desert?",
+    "options": [
+      "Tropical evergreen forest",
+      "Mangrove forest",
+      "Desert thorn forest",
+      "Deciduous forest"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Desert thorn forests dominate the Thar Desert region. These plants are adapted to arid conditions with features like deep roots, small leaves, and thorny structures that reduce water loss and help them survive in extreme dryness."
+  },
+  {
+    "id": "thar-6",
+    "question": "Which wind is mainly responsible for bringing sand into the Thar Desert?",
+    "options": [
+      "Monsoon winds",
+      "Trade winds",
+      "Local desert winds",
+      "Cyclonic winds"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Local desert winds play a major role in transporting and depositing sand within the Thar Desert. These winds are often strong and dry, leading to frequent sandstorms and continuous reshaping of the desert landscape."
+  },
+  {
+    "id": "thar-7",
+    "question": "Which canal has significantly contributed to irrigation in the Thar Desert?",
+    "options": [
+      "Indira Gandhi Canal",
+      "Gang Canal",
+      "Bhakra Canal",
+      "Narmada Canal"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Indira Gandhi Canal is the most important irrigation project in the Thar Desert. It has transformed large parts of the desert into cultivable land by providing water from the Sutlej and Beas rivers, boosting agriculture and settlement."
+  },
+  {
+    "id": "thar-8",
+    "question": "What is the main climatic characteristic of the Thar Desert?",
+    "options": [
+      "High humidity",
+      "Moderate rainfall",
+      "Extreme temperature variation",
+      "Heavy snowfall"
+    ],
+    "correctAnswer": "C",
+    "explanation": "The Thar Desert experiences extreme temperature variations, with very hot summers and cold winters. Day-night temperature differences are also high due to low humidity and lack of cloud cover, making the climate harsh and unstable."
+  },
+  {
+    "id": "thar-9",
+    "question": "Which animal is commonly associated with the Thar Desert ecosystem?",
+    "options": [
+      "Yak",
+      "Camel",
+      "Elephant",
+      "Lion"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The camel is widely known as the 'ship of the desert' and is well adapted to the harsh conditions of the Thar Desert. It can survive long periods without water and is used for transport and livelihood in desert regions."
+  },
+  {
+    "id": "thar-10",
+    "question": "Which region of Rajasthan is most densely covered by the Thar Desert?",
+    "options": [
+      "Eastern Rajasthan",
+      "Southern Rajasthan",
+      "Western Rajasthan",
+      "Northern Rajasthan"
+    ],
+    "correctAnswer": "C",
+    "explanation": "The Thar Desert predominantly occupies western Rajasthan, including districts like Jaisalmer, Barmer, and Bikaner. This region is characterized by arid climate, sand dunes, low rainfall, and sparse vegetation, forming the core desert area."
+  }
+]

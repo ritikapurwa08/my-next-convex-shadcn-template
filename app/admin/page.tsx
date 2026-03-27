@@ -1,5 +1,10 @@
 "use client";
 
+// ============================================================
+// फाइल को यहाँ रखें:  app/admin/page.tsx
+// (पुरानी file को पूरी तरह replace करें)
+// ============================================================
+
 import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -7,7 +12,8 @@ import Sidebar from "@/components/layout/sidebar";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { cn } from "@/lib/utils";
 
-const SUBJECTS = [
+// ─── Default seed data (हार्डकोड — नए subjects/topics runtime में add होते हैं) ───
+const DEFAULT_SUBJECTS = [
   "Rajasthan History",
   "Rajasthan Geography",
   "Indian Polity",
@@ -16,7 +22,7 @@ const SUBJECTS = [
   "Psychology",
 ];
 
-const TOPIC_MAP: Record<string, string[]> = {
+const DEFAULT_TOPIC_MAP: Record<string, string[]> = {
   "Rajasthan History": [
     "Chauhan Dynasty",
     "Mewar Dynasty",
@@ -56,27 +62,277 @@ const SAMPLE_JSON_TEMPLATE = `[
 ]`;
 
 const AI_PROMPT_TEMPLATE = (subject: string, topic: string) =>
-  `Generate 10 multiple-choice questions about "${topic}" from the subject "${subject}" for a competitive exam like RPSC/RAS. Each question must have exactly 4 options, one correct answer, and a 40-50 word explanation. Return ONLY a valid JSON array in this format:
-[{ "id": "unique-id", "question": "...", "options": ["A","B","C","D"], "correctAnswer": "A", "explanation": "..." }]`;
+  `Generate 10 multiple-choice questions about "${topic}" from the subject "${subject}" for a competitive exam like RPSC/RAS. Each question must have exactly 4 options, one correct answer, and a 40-50 word explanation. Return ONLY a valid JSON array in this format:\n[{ "id": "unique-id", "question": "...", "options": ["A","B","C","D"], "correctAnswer": "A", "explanation": "..." }]`;
 
+// ─── छोटा reusable component: Dropdown + "Add New" ─────────
+// value        = currently selected value
+// options      = list of existing options
+// onChange     = जब existing option चुनें
+// onAddNew     = जब नया नाम confirm करें
+// label        = "Subject" / "Topic" / "Set Name"
+// placeholder  = input placeholder when adding new
+interface SelectOrAddProps {
+  value: string;
+  options: string[];
+  onChange: (val: string) => void;
+  onAddNew: (val: string) => void;
+  label: string;
+  placeholder: string;
+}
+
+function SelectOrAdd({
+  value,
+  options,
+  onChange,
+  onAddNew,
+  label,
+  placeholder,
+}: SelectOrAddProps) {
+  const ADD_NEW_SENTINEL = "__ADD_NEW__";
+  const [adding, setAdding] = useState(false);
+  const [newVal, setNewVal] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value === ADD_NEW_SENTINEL) {
+      setAdding(true);
+      setNewVal("");
+      setError("");
+    } else {
+      onChange(e.target.value);
+    }
+  };
+
+  const handleConfirm = () => {
+    const trimmed = newVal.trim();
+    if (!trimmed) {
+      setError("नाम खाली नहीं हो सकता");
+      return;
+    }
+    if (options.map((o) => o.toLowerCase()).includes(trimmed.toLowerCase())) {
+      setError("यह नाम पहले से exist करता है");
+      return;
+    }
+    onAddNew(trimmed);
+    setAdding(false);
+    setNewVal("");
+    setError("");
+  };
+
+  const handleCancel = () => {
+    setAdding(false);
+    setNewVal("");
+    setError("");
+  };
+
+  if (adding) {
+    return (
+      <div className="space-y-2">
+        <label className="text-[11px] font-bold text-secondary uppercase tracking-widest">
+          {label}{" "}
+          <span className="text-primary normal-case font-normal">
+            (नया बनाएं)
+          </span>
+        </label>
+        <input
+          autoFocus
+          type="text"
+          value={newVal}
+          onChange={(e) => {
+            setNewVal(e.target.value);
+            setError("");
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleConfirm();
+            if (e.key === "Escape") handleCancel();
+          }}
+          placeholder={placeholder}
+          className="w-full bg-surface-container-lowest border border-primary/40 rounded-xl p-3 text-sm outline-none text-on-surface focus:border-primary transition-colors"
+        />
+        {error && <p className="text-xs text-error">{error}</p>}
+        <div className="flex gap-2">
+          <button
+            onClick={handleConfirm}
+            className="flex-1 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:shadow-md transition-all"
+          >
+            ✓ Add
+          </button>
+          <button
+            onClick={handleCancel}
+            className="flex-1 py-2 rounded-xl border border-outline-variant/30 text-xs font-bold text-secondary hover:bg-surface-container transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <label className="text-[11px] font-bold text-secondary uppercase tracking-widest">
+        {label}
+      </label>
+      <div className="relative">
+        <select
+          className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-3 text-sm outline-none appearance-none text-on-surface cursor-pointer"
+          value={value}
+          onChange={handleSelectChange}
+        >
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+          <option disabled>──────────</option>
+          <option value={ADD_NEW_SENTINEL}>+ नया {label} बनाएं</option>
+        </select>
+        <MaterialIcon
+          name="expand_more"
+          className="absolute right-3 top-3 pointer-events-none text-outline text-lg"
+        />
+      </div>
+    </div>
+  );
+}
+
+// ─── Set Name: text input (1-5 buttons हटाए) ────────────────
+interface SetNameInputProps {
+  value: string;
+  onChange: (val: string) => void;
+}
+
+function SetNameInput({ value, onChange }: SetNameInputProps) {
+  return (
+    <div className="space-y-2">
+      <label className="text-[11px] font-bold text-secondary uppercase tracking-widest">
+        Set Name
+      </label>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="e.g. Chauhan-Dynasty-Part-1"
+        className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-3 text-sm outline-none text-on-surface focus:border-primary/40 transition-colors font-mono"
+      />
+      <p className="text-[10px] text-secondary">
+        Spaces की जगह hyphen (-) इस्तेमाल करें। यही फाइल का नाम बनेगा।
+      </p>
+    </div>
+  );
+}
+
+// ─── Main Admin Page ────────────────────────────────────────
 export default function AdminPage() {
   const user = useQuery(api.users.current);
 
-  const [subject, setSubject] = useState(SUBJECTS[0]);
-  const [topic, setTopic] = useState(TOPIC_MAP[SUBJECTS[0]][0]);
-  const [setNumber, setSetNumber] = useState(1);
+  // Dynamic subject & topic lists (session में add होते हैं)
+  const [subjects, setSubjects] = useState<string[]>(DEFAULT_SUBJECTS);
+  const [topicMap, setTopicMap] =
+    useState<Record<string, string[]>>(DEFAULT_TOPIC_MAP);
+
+  const [subject, setSubject] = useState(DEFAULT_SUBJECTS[0]);
+  const [topic, setTopic] = useState(DEFAULT_TOPIC_MAP[DEFAULT_SUBJECTS[0]][0]);
+  const [setName, setSetName] = useState("");
+
   const [jsonInput, setJsonInput] = useState("");
   const [parseError, setParseError] = useState("");
   const [parseSuccess, setParseSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [saveResult, setSaveResult] = useState<{
+    ok: boolean;
+    msg: string;
+    path?: string;
+  } | null>(null);
 
   // AI generator
   const [aiPrompt, setAiPrompt] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiOutput, setAiOutput] = useState("");
 
-  // Guard: only admin
+  // ── Handlers: subject ──────────────────────────────────────
+  const handleSubjectChange = (s: string) => {
+    setSubject(s);
+    const topics = topicMap[s] ?? [];
+    setTopic(topics[0] ?? "");
+  };
+
+  const handleAddSubject = (newSubject: string) => {
+    setSubjects((prev) => [...prev, newSubject]);
+    setTopicMap((prev) => ({ ...prev, [newSubject]: [] }));
+    setSubject(newSubject);
+    setTopic("");
+  };
+
+  // ── Handlers: topic ────────────────────────────────────────
+  const handleAddTopic = (newTopic: string) => {
+    setTopicMap((prev) => ({
+      ...prev,
+      [subject]: [...(prev[subject] ?? []), newTopic],
+    }));
+    setTopic(newTopic);
+  };
+
+  // ── Validate JSON ──────────────────────────────────────────
+  const handleValidate = () => {
+    setParseError("");
+    setParseSuccess(false);
+    setSaveResult(null);
+    try {
+      const parsed = JSON.parse(jsonInput);
+      if (!Array.isArray(parsed))
+        throw new Error("Root must be a JSON array [ ... ]");
+      parsed.forEach((q: Record<string, unknown>, i: number) => {
+        if (
+          !q.id ||
+          !q.question ||
+          !Array.isArray(q.options) ||
+          !q.correctAnswer ||
+          !q.explanation
+        )
+          throw new Error(
+            `Question ${i + 1}: id, question, options, correctAnswer, explanation — सब ज़रूरी हैं।`,
+          );
+        if ((q.options as unknown[]).length < 4)
+          throw new Error(`Question ${i + 1}: कम से कम 4 options होने चाहिए।`);
+      });
+      setParseSuccess(true);
+    } catch (e) {
+      setParseError((e as Error).message);
+    }
+  };
+
+  // ── Save to local filesystem via API route ─────────────────
+  const handleSave = async () => {
+    if (!setName.trim()) {
+      setParseError("Set Name खाली है — पहले Set Name लिखें।");
+      return;
+    }
+    setSaving(true);
+    setSaveResult(null);
+    try {
+      const res = await fetch("/api/save-quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject,
+          topic,
+          setName: setName.trim().replace(/\s+/g, "-"),
+          questions: JSON.parse(jsonInput),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Save failed");
+      setSaveResult({ ok: true, msg: data.message, path: data.savedTo });
+    } catch (e) {
+      setSaveResult({ ok: false, msg: (e as Error).message });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ── File path preview ──────────────────────────────────────
+  const previewPath = `data/questions/${subject.replace(/\s+/g, "-")}/${topic.replace(/\s+/g, "-")}/${setName.trim().replace(/\s+/g, "-") || "<set-name>"}.json`;
+
+  // ── Guards ─────────────────────────────────────────────────
   if (user === undefined) {
     return (
       <div className="flex min-h-screen bg-surface">
@@ -100,73 +356,19 @@ export default function AdminPage() {
             Access Denied
           </h2>
           <p className="text-secondary text-sm max-w-sm">
-            This page is restricted to administrators only. Contact your admin
-            to request access.
+            This page is restricted to administrators only.
           </p>
         </main>
       </div>
     );
   }
 
-  const handleSubjectChange = (s: string) => {
-    setSubject(s);
-    setTopic(TOPIC_MAP[s][0]);
-  };
-
-  const handleValidate = () => {
-    setParseError("");
-    setParseSuccess(false);
-    try {
-      const parsed = JSON.parse(jsonInput);
-      if (!Array.isArray(parsed)) throw new Error("Root must be a JSON array");
-      parsed.forEach((q: Record<string, unknown>, i: number) => {
-        if (
-          !q.id ||
-          !q.question ||
-          !Array.isArray(q.options) ||
-          !q.correctAnswer ||
-          !q.explanation
-        )
-          throw new Error(`Question ${i + 1} is missing required fields.`);
-        if ((q.options as unknown[]).length < 2)
-          throw new Error(`Question ${i + 1} must have at least 2 options.`);
-      });
-      setParseSuccess(true);
-    } catch (e) {
-      setParseError((e as Error).message);
-    }
-  };
-
-  const handleSave = async () => {
-    setSaving(true);
-    // In production: POST to local Bun proxy server that writes to /data/questions folder
-    // For now, simulate save
-    await new Promise((r) => setTimeout(r, 800));
-    setSaved(true);
-    setSaving(false);
-    setTimeout(() => setSaved(false), 3000);
-  };
-
-  const handleGeneratePrompt = () => {
-    setAiPrompt(AI_PROMPT_TEMPLATE(subject, topic));
-  };
-
-  const handleCopyPrompt = () => {
-    navigator.clipboard.writeText(aiPrompt);
-  };
-
-  const handlePasteAiOutput = () => {
-    setJsonInput(aiOutput);
-    setAiOutput("");
-    setParseSuccess(false);
-    setParseError("");
-  };
-
+  // ── Render ─────────────────────────────────────────────────
   return (
     <div className="flex min-h-screen bg-surface">
       <Sidebar />
 
-      {/* Main editor */}
+      {/* ── Main editor ── */}
       <main className="flex-1 ml-64 mr-80 overflow-y-auto p-10">
         <header className="mb-10">
           <div className="flex items-center gap-3 mb-2">
@@ -181,8 +383,7 @@ export default function AdminPage() {
             Upload Questions
           </h2>
           <p className="text-sm text-secondary mt-1">
-            Paste a JSON array of questions to bulk upload to a subject and
-            topic.
+            JSON paste करें, subject/topic/set चुनें, और locally save करें।
           </p>
         </header>
 
@@ -200,6 +401,7 @@ export default function AdminPage() {
                 Insert template
               </button>
             </div>
+
             <div
               className={cn(
                 "rounded-xl ring-1 ring-inset overflow-hidden",
@@ -222,10 +424,12 @@ export default function AdminPage() {
                   setJsonInput(e.target.value);
                   setParseSuccess(false);
                   setParseError("");
+                  setSaveResult(null);
                 }}
               />
             </div>
 
+            {/* Error / Success messages */}
             {parseError && (
               <div className="flex items-start gap-2 p-3 bg-error-container/20 border border-error/20 rounded-xl text-sm text-error">
                 <MaterialIcon
@@ -235,13 +439,37 @@ export default function AdminPage() {
                 {parseError}
               </div>
             )}
-            {parseSuccess && (
+            {parseSuccess && !saveResult && (
               <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-xl text-sm text-primary">
                 <MaterialIcon name="check_circle" className="text-base" />
-                JSON is valid and ready to save.
+                JSON valid है — अब Save कर सकते हैं।
+              </div>
+            )}
+            {saveResult && (
+              <div
+                className={cn(
+                  "flex items-start gap-2 p-3 rounded-xl text-sm border",
+                  saveResult.ok
+                    ? "bg-primary/5 border-primary/20 text-primary"
+                    : "bg-error-container/20 border-error/20 text-error",
+                )}
+              >
+                <MaterialIcon
+                  name={saveResult.ok ? "check_circle" : "error"}
+                  className="text-base shrink-0 mt-0.5"
+                />
+                <div>
+                  <p className="font-bold">{saveResult.msg}</p>
+                  {saveResult.path && (
+                    <p className="font-mono text-xs mt-1 opacity-70">
+                      → {saveResult.path}
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 
+            {/* Action buttons */}
             <div className="flex gap-3">
               <button
                 onClick={handleValidate}
@@ -250,6 +478,7 @@ export default function AdminPage() {
                 <MaterialIcon name="verified" className="text-base" />
                 Validate JSON
               </button>
+
               {parseSuccess && (
                 <button
                   onClick={handleSave}
@@ -261,15 +490,10 @@ export default function AdminPage() {
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       Saving…
                     </>
-                  ) : saved ? (
-                    <>
-                      <MaterialIcon name="check" />
-                      Saved!
-                    </>
                   ) : (
                     <>
                       <MaterialIcon name="save" />
-                      Save to {subject} / {topic} (Set {setNumber})
+                      Validate &amp; Save Locally
                     </>
                   )}
                 </button>
@@ -286,42 +510,40 @@ export default function AdminPage() {
               </h3>
             </div>
             <p className="text-sm text-secondary">
-              Generate a prompt for any AI tool (ChatGPT, Claude, Gemini) to
-              produce questions in the correct format.
+              किसी भी AI tool (ChatGPT, Gemini) के लिए prompt generate करें —
+              सही format में questions बनाने के लिए।
             </p>
 
             <button
-              onClick={handleGeneratePrompt}
+              onClick={() => setAiPrompt(AI_PROMPT_TEMPLATE(subject, topic))}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface-container border border-outline-variant/20 text-sm font-bold text-on-surface hover:border-primary/30 transition-colors"
             >
               <MaterialIcon name="auto_awesome" className="text-base" />
-              Generate Prompt for &quot;{topic}&quot;
+              Generate Prompt for &quot;{topic || subject}&quot;
             </button>
 
             {aiPrompt && (
-              <div className="space-y-3">
-                <div className="bg-surface-container rounded-xl p-4 relative">
-                  <pre className="text-xs font-mono text-on-surface-variant whitespace-pre-wrap leading-relaxed">
-                    {aiPrompt}
-                  </pre>
-                  <button
-                    onClick={handleCopyPrompt}
-                    className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-surface-container-high transition-colors"
-                    title="Copy prompt"
-                  >
-                    <MaterialIcon
-                      name="content_copy"
-                      className="text-sm text-secondary"
-                    />
-                  </button>
-                </div>
+              <div className="bg-surface-container rounded-xl p-4 relative">
+                <pre className="text-xs font-mono text-on-surface-variant whitespace-pre-wrap leading-relaxed pr-8">
+                  {aiPrompt}
+                </pre>
+                <button
+                  onClick={() => navigator.clipboard.writeText(aiPrompt)}
+                  className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-surface-container-high transition-colors"
+                  title="Copy prompt"
+                >
+                  <MaterialIcon
+                    name="content_copy"
+                    className="text-sm text-secondary"
+                  />
+                </button>
               </div>
             )}
           </section>
         </div>
       </main>
 
-      {/* Right classification panel */}
+      {/* ── Right classification panel ── */}
       <aside className="w-80 fixed right-0 top-0 h-screen bg-surface-container-low border-l border-outline-variant/20 p-7 overflow-y-auto flex flex-col">
         <div className="space-y-6 flex-1">
           <div className="flex items-center gap-2">
@@ -331,94 +553,58 @@ export default function AdminPage() {
             </h3>
           </div>
 
-          {/* Subject */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold text-secondary uppercase tracking-widest">
-              Subject
-            </label>
-            <div className="relative">
-              <select
-                className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-3 text-sm outline-none appearance-none text-on-surface"
-                value={subject}
-                onChange={(e) => handleSubjectChange(e.target.value)}
-              >
-                {SUBJECTS.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-              <MaterialIcon
-                name="expand_more"
-                className="absolute right-3 top-3 pointer-events-none text-outline text-lg"
-              />
-            </div>
-          </div>
+          {/* Subject — dropdown + Add New */}
+          <SelectOrAdd
+            label="Subject"
+            value={subject}
+            options={subjects}
+            onChange={handleSubjectChange}
+            onAddNew={handleAddSubject}
+            placeholder="e.g. Modern History"
+          />
 
-          {/* Topic */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold text-secondary uppercase tracking-widest">
-              Topic
-            </label>
-            <div className="relative">
-              <select
-                className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-3 text-sm outline-none appearance-none text-on-surface"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-              >
-                {(TOPIC_MAP[subject] ?? []).map((t) => (
-                  <option key={t}>{t}</option>
-                ))}
-              </select>
-              <MaterialIcon
-                name="expand_more"
-                className="absolute right-3 top-3 pointer-events-none text-outline text-lg"
-              />
-            </div>
-          </div>
+          {/* Topic — dropdown + Add New (subject पर depend करता है) */}
+          <SelectOrAdd
+            label="Topic"
+            value={topic}
+            options={topicMap[subject] ?? []}
+            onChange={setTopic}
+            onAddNew={handleAddTopic}
+            placeholder="e.g. Mughal Empire"
+          />
 
-          {/* Set number */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold text-secondary uppercase tracking-widest">
-              Set Number
-            </label>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setSetNumber(n)}
-                  className={cn(
-                    "flex-1 py-2 rounded-xl text-sm font-bold border transition-colors",
-                    setNumber === n
-                      ? "bg-primary text-white border-primary"
-                      : "border-outline-variant/20 text-secondary hover:border-primary/30",
-                  )}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Set Name — free text input */}
+          <SetNameInput value={setName} onChange={setSetName} />
 
-          {/* File path preview */}
+          {/* Live file path preview */}
           <div className="p-3 bg-surface-container rounded-xl">
             <p className="text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">
-              Save path
+              Save path preview
             </p>
-            <p className="text-xs font-mono text-on-surface-variant break-all">
-              /data/questions/{subject.toLowerCase().replace(/ /g, "-")}/
-              {topic.toLowerCase().replace(/ /g, "-")}-set{setNumber}.json
+            <p className="text-xs font-mono text-on-surface-variant break-all leading-relaxed">
+              {previewPath}
             </p>
           </div>
         </div>
 
-        {/* Publish */}
+        {/* Bottom: single save button */}
         <div className="pt-6 border-t border-outline-variant/20">
           <button
             onClick={parseSuccess ? handleSave : handleValidate}
             disabled={saving}
             className="w-full py-4 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
           >
-            <MaterialIcon name="publish" />
-            {parseSuccess ? "Publish to Orbit" : "Validate & Publish"}
+            {saving ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving…
+              </>
+            ) : (
+              <>
+                <MaterialIcon name="save" />
+                {parseSuccess ? "Validate & Save Locally" : "Validate JSON"}
+              </>
+            )}
           </button>
         </div>
       </aside>

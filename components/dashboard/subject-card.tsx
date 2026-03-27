@@ -10,12 +10,12 @@ export function SubjectCard({ title, icon }: SubjectCardProps) {
     <div className="group relative bg-surface-container-lowest p-8 rounded-xl transition-all duration-300 hover:translate-y-[-4px]">
       <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity"></div>
       <div className="relative">
-        <div className="flex flex-row gap-x-2">
-          <div className="w-14 h-14 min-h-14 min-w-14 bg-surface-container-low rounded-xl flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+        <div className="flex flex-row items-center  gap-x-2">
+          <div className="size-10 min-h-10 min-w-10 bg-surface-container-low rounded-xl flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
             <MaterialIcon name={icon} className="text-3xl" />
           </div>
 
-          <h3 className="text-xl items-center font-headline font-bold text-on-surface mb-2">
+          <h3 className="text-lg items-center font-headline font-bold text-on-surface mb-2">
             {title}
           </h3>
         </div>
