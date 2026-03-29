@@ -36,7 +36,6 @@ export default function HistoryPage() {
     timeFilter,
   });
 
-  const stats = useQuery(api.quizHistory.stats);
 
   const chartData = useMemo(() => {
     if (!records) return [];
@@ -64,27 +63,6 @@ export default function HistoryPage() {
         </p>
       </header>
 
-      {/* Stats row */}
-      {stats && (
-        <div className="grid grid-cols-3 gap-4">
-          <StatCard
-            icon="quiz"
-            label="Total Quizzes"
-            value={String(stats.totalQuizzes)}
-          />
-          <StatCard
-            icon="percent"
-            label="Avg Accuracy"
-            value={`${stats.avgAccuracy}%`}
-          />
-          <StatCard
-            icon="star"
-            label="Best Subject"
-            value={stats.bestSubject}
-            small
-          />
-        </div>
-      )}
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
@@ -293,35 +271,3 @@ export default function HistoryPage() {
   );
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  small,
-}: {
-  icon: string;
-  label: string;
-  value: string;
-  small?: boolean;
-}) {
-  return (
-    <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-          <MaterialIcon name={icon} className="text-base" />
-        </div>
-        <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">
-          {label}
-        </span>
-      </div>
-      <p
-        className={cn(
-          "font-headline font-extrabold text-on-surface",
-          small ? "text-base" : "text-3xl",
-        )}
-      >
-        {value}
-      </p>
-    </div>
-  );
-}

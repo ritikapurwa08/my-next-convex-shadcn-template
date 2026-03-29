@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/", icon: "dashboard" },
   { name: "History", href: "/history", icon: "history" },
-  { name: "Analytics", href: "/analytics", icon: "analytics" },
 ];
 
 export default function Sidebar() {
@@ -76,6 +75,18 @@ export default function Sidebar() {
             >
               <MaterialIcon name="quiz" />
               <span className="text-sm font-body">Quiz Questions</span>
+            </Link>
+            <Link
+              href="/admin/stored"
+              className={cn(
+                "flex items-center gap-x-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200",
+                pathname === "/admin/stored"
+                  ? "text-blue-700 dark:text-blue-400 font-bold border-r-4 border-blue-700 bg-blue-50/50"
+                  : "text-slate-500 hover:text-blue-600 hover:bg-slate-200/50",
+              )}
+            >
+              <MaterialIcon name="list_alt" />
+              <span className="text-sm font-body">Stored Questions</span>
             </Link>
           </>
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { cn } from "@/lib/utils";
 
@@ -36,12 +36,32 @@ const DEFAULT_SUBJECTS = [
 ];
 
 const DEFAULT_TOPIC_MAP: Record<string, string[]> = {
-  "Rajasthan History": ["Chauhan Dynasty", "Mewar Dynasty", "Marwar", "Modern Rajasthan"],
+  "Rajasthan History": [
+    "Chauhan Dynasty",
+    "Mewar Dynasty",
+    "Marwar",
+    "Modern Rajasthan",
+  ],
   "Art & Culture": ["Folk Music", "Handicrafts", "Festivals", "Architecture"],
   "Rajasthan Geography": ["Aravalli Range", "Thar Desert", "Rivers", "Climate"],
-  "Indian Polity": ["Constitutional Framework", "Fundamental Rights", "DPSP", "Parliament"],
-  "Indian Geography": ["Himalayan System", "Peninsular Rivers", "Climate Zones", "Soils"],
-  Psychology: ["Cognitive Development", "Learning Theories", "Motivation", "Assessment"],
+  "Indian Polity": [
+    "Constitutional Framework",
+    "Fundamental Rights",
+    "DPSP",
+    "Parliament",
+  ],
+  "Indian Geography": [
+    "Himalayan System",
+    "Peninsular Rivers",
+    "Climate Zones",
+    "Soils",
+  ],
+  Psychology: [
+    "Cognitive Development",
+    "Learning Theories",
+    "Motivation",
+    "Assessment",
+  ],
 };
 
 const SAMPLE_JSON = `[
@@ -63,7 +83,11 @@ const SAMPLE_JSON = `[
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function toSlug(s: string) {
-  return s.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 }
 
 // ── SelectOrAdd component ──────────────────────────────────────────────────
@@ -77,37 +101,79 @@ interface SelectOrAddProps {
   disabled?: boolean;
 }
 
-function SelectOrAdd({ label, value, options, onChange, onAddNew, placeholder, disabled }: SelectOrAddProps) {
+function SelectOrAdd({
+  label,
+  value,
+  options,
+  onChange,
+  onAddNew,
+  placeholder,
+  disabled,
+}: SelectOrAddProps) {
   const [adding, setAdding] = useState(false);
   const [newVal, setNewVal] = useState("");
   const [error, setError] = useState("");
 
   const handleConfirm = () => {
     const trimmed = newVal.trim();
-    if (!trimmed) { setError("Name cannot be empty"); return; }
+    if (!trimmed) {
+      setError("Name cannot be empty");
+      return;
+    }
     if (options.map((o) => o.toLowerCase()).includes(trimmed.toLowerCase())) {
-      setError("Already exists"); return;
+      setError("Already exists");
+      return;
     }
     onAddNew(trimmed);
-    setAdding(false); setNewVal(""); setError("");
+    setAdding(false);
+    setNewVal("");
+    setError("");
   };
 
   if (adding) {
     return (
       <div className="space-y-2">
         <label className="text-[10px] font-bold text-secondary uppercase tracking-widest block">
-          {label} <span className="text-primary normal-case font-normal">(new)</span>
+          {label}{" "}
+          <span className="text-primary normal-case font-normal">(new)</span>
         </label>
         <input
-          autoFocus type="text" value={newVal} placeholder={placeholder}
-          onChange={(e) => { setNewVal(e.target.value); setError(""); }}
-          onKeyDown={(e) => { if (e.key === "Enter") handleConfirm(); if (e.key === "Escape") { setAdding(false); setNewVal(""); setError(""); } }}
+          autoFocus
+          type="text"
+          value={newVal}
+          placeholder={placeholder}
+          onChange={(e) => {
+            setNewVal(e.target.value);
+            setError("");
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleConfirm();
+            if (e.key === "Escape") {
+              setAdding(false);
+              setNewVal("");
+              setError("");
+            }
+          }}
           className="w-full bg-surface-container-lowest border border-primary/40 rounded-xl p-3 text-sm outline-none text-on-surface focus:border-primary transition-colors"
         />
         {error && <p className="text-xs text-error">{error}</p>}
         <div className="flex gap-2">
-          <button onClick={handleConfirm} className="flex-1 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:shadow-md transition-all">✓ Add</button>
-          <button onClick={() => { setAdding(false); setNewVal(""); setError(""); }} className="flex-1 py-2 rounded-xl border border-outline-variant/30 text-xs font-bold text-secondary hover:bg-surface-container transition-colors">Cancel</button>
+          <button
+            onClick={handleConfirm}
+            className="flex-1 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:shadow-md transition-all"
+          >
+            ✓ Add
+          </button>
+          <button
+            onClick={() => {
+              setAdding(false);
+              setNewVal("");
+              setError("");
+            }}
+            className="flex-1 py-2 rounded-xl border border-outline-variant/30 text-xs font-bold text-secondary hover:bg-surface-container transition-colors"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     );
@@ -115,39 +181,78 @@ function SelectOrAdd({ label, value, options, onChange, onAddNew, placeholder, d
 
   return (
     <div className="space-y-2">
-      <label className="text-[10px] font-bold text-secondary uppercase tracking-widest block">{label}</label>
+      <label className="text-[10px] font-bold text-secondary uppercase tracking-widest block">
+        {label}
+      </label>
       <div className="relative">
         <select
-          value={value} disabled={disabled}
-          onChange={(e) => { if (e.target.value === "__ADD__") setAdding(true); else onChange(e.target.value); }}
+          value={value}
+          disabled={disabled}
+          onChange={(e) => {
+            if (e.target.value === "__ADD__") setAdding(true);
+            else onChange(e.target.value);
+          }}
           className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-3 text-sm outline-none appearance-none text-on-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {options.map((o) => <option key={o} value={o}>{o}</option>)}
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
           <option disabled>──────────</option>
           <option value="__ADD__">+ Add New {label}</option>
         </select>
-        <MaterialIcon name="expand_more" className="absolute right-3 top-3.5 pointer-events-none text-outline text-lg" />
+        <MaterialIcon
+          name="expand_more"
+          className="absolute right-3 top-3.5 pointer-events-none text-outline text-lg"
+        />
       </div>
     </div>
   );
 }
 
 // ── Validation ─────────────────────────────────────────────────────────────
-function validateInput(parsed: unknown): { valid: true; questions: RawInputQuestion[] } | { valid: false; error: string } {
-  if (!Array.isArray(parsed)) return { valid: false, error: "Root must be a JSON array [ ... ]" };
-  if (parsed.length === 0) return { valid: false, error: "Array must not be empty" };
+function validateInput(
+  parsed: unknown,
+):
+  | { valid: true; questions: RawInputQuestion[] }
+  | { valid: false; error: string } {
+  if (!Array.isArray(parsed))
+    return { valid: false, error: "Root must be a JSON array [ ... ]" };
+  if (parsed.length === 0)
+    return { valid: false, error: "Array must not be empty" };
   for (let i = 0; i < parsed.length; i++) {
     const q = parsed[i] as Record<string, unknown>;
     if (!q.question || typeof q.question !== "string")
-      return { valid: false, error: `Question ${i + 1}: 'question' field is required` };
+      return {
+        valid: false,
+        error: `Question ${i + 1}: 'question' field is required`,
+      };
     if (!Array.isArray(q.options) || q.options.length !== 4)
-      return { valid: false, error: `Question ${i + 1}: 'options' must be an array of exactly 4 strings` };
-    if ((q.options as unknown[]).some((o) => typeof o !== "string" || !(o as string).trim()))
-      return { valid: false, error: `Question ${i + 1}: all 4 options must be non-empty strings` };
+      return {
+        valid: false,
+        error: `Question ${i + 1}: 'options' must be an array of exactly 4 strings`,
+      };
+    if (
+      (q.options as unknown[]).some(
+        (o) => typeof o !== "string" || !(o as string).trim(),
+      )
+    )
+      return {
+        valid: false,
+        error: `Question ${i + 1}: all 4 options must be non-empty strings`,
+      };
     const ans = (q.correctAnswer ?? q.answer) as string | undefined;
-    if (!ans) return { valid: false, error: `Question ${i + 1}: 'correctAnswer' or 'answer' is required` };
+    if (!ans)
+      return {
+        valid: false,
+        error: `Question ${i + 1}: 'correctAnswer' or 'answer' is required`,
+      };
     if (!(q.options as string[]).includes(ans))
-      return { valid: false, error: `Question ${i + 1}: correctAnswer "${ans}" must match one of the options` };
+      return {
+        valid: false,
+        error: `Question ${i + 1}: correctAnswer "${ans}" must match one of the options`,
+      };
   }
   return { valid: true, questions: parsed as RawInputQuestion[] };
 }
@@ -156,7 +261,8 @@ function validateInput(parsed: unknown): { valid: true; questions: RawInputQuest
 export default function QuestionsAdminPage() {
   // ── Classification state ─────────────────────────────────────────────
   const [subjects, setSubjects] = useState<string[]>(DEFAULT_SUBJECTS);
-  const [topicMap, setTopicMap] = useState<Record<string, string[]>>(DEFAULT_TOPIC_MAP);
+  const [topicMap, setTopicMap] =
+    useState<Record<string, string[]>>(DEFAULT_TOPIC_MAP);
   const [subject, setSubject] = useState(DEFAULT_SUBJECTS[0]);
   const [topic, setTopic] = useState(DEFAULT_TOPIC_MAP[DEFAULT_SUBJECTS[0]][0]);
   const [setName, setSetName] = useState("");
@@ -167,35 +273,26 @@ export default function QuestionsAdminPage() {
   const [parseSuccess, setParseSuccess] = useState(false);
   const [validatedCount, setValidatedCount] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<{ type: "ok" | "error"; text: string } | null>(null);
-
-  // ── Stored questions ─────────────────────────────────────────────────
-  const [stored, setStored] = useState<QuizQuestion[]>([]);
-  const [viewSubject, setViewSubject] = useState("__ALL__");
-  const [viewTopic, setViewTopic] = useState("__ALL__");
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-
-  // ── Load from localStorage ───────────────────────────────────────────
-  const loadStored = useCallback(() => {
-    if (typeof window === "undefined") return;
-    const qs: QuizQuestion[] = JSON.parse(localStorage.getItem("quiz_questions") || "[]");
-    setStored(qs);
-  }, []);
-
-  useEffect(() => { loadStored(); }, [loadStored]);
+  const [saveMsg, setSaveMsg] = useState<{
+    type: "ok" | "error";
+    text: string;
+  } | null>(null);
 
   // ── Subject change ───────────────────────────────────────────────────
   const handleSubjectChange = (s: string) => {
     setSubject(s);
     const topics = topicMap[s] ?? [];
     setTopic(topics[0] ?? "");
-    setParseSuccess(false); setParseError(""); setSaveMsg(null);
+    setParseSuccess(false);
+    setParseError("");
+    setSaveMsg(null);
   };
 
   const handleAddSubject = (s: string) => {
     setSubjects((p) => [...p, s]);
     setTopicMap((p) => ({ ...p, [s]: [] }));
-    setSubject(s); setTopic("");
+    setSubject(s);
+    setTopic("");
   };
 
   // ── Topic change ─────────────────────────────────────────────────────
@@ -206,12 +303,20 @@ export default function QuestionsAdminPage() {
 
   // ── Validate ─────────────────────────────────────────────────────────
   const handleValidate = () => {
-    setParseError(""); setParseSuccess(false); setSaveMsg(null);
-    if (!setName.trim()) { setParseError("Set Name is required before validating."); return; }
+    setParseError("");
+    setParseSuccess(false);
+    setSaveMsg(null);
+    if (!setName.trim()) {
+      setParseError("Set Name is required before validating.");
+      return;
+    }
     try {
       const parsed = JSON.parse(jsonInput);
       const result = validateInput(parsed);
-      if (!result.valid) { setParseError(result.error); return; }
+      if (!result.valid) {
+        setParseError(result.error);
+        return;
+      }
       setParseSuccess(true);
       setValidatedCount(result.questions.length);
     } catch (e) {
@@ -221,8 +326,12 @@ export default function QuestionsAdminPage() {
 
   // ── Save ─────────────────────────────────────────────────────────────
   const handleSave = async () => {
-    if (!parseSuccess) { handleValidate(); return; }
-    setSaving(true); setSaveMsg(null);
+    if (!parseSuccess) {
+      handleValidate();
+      return;
+    }
+    setSaving(true);
+    setSaveMsg(null);
     try {
       const parsed: RawInputQuestion[] = JSON.parse(jsonInput);
       const withMeta: QuizQuestion[] = parsed.map((q) => ({
@@ -257,46 +366,27 @@ export default function QuestionsAdminPage() {
       const apiData = await res.json();
       if (!res.ok) throw new Error(apiData.error || "Local API save failed");
 
-      // 2. Save to localStorage for browser view
-      const existing: QuizQuestion[] = JSON.parse(localStorage.getItem("quiz_questions") || "[]");
-      localStorage.setItem("quiz_questions", JSON.stringify([...existing, ...withMeta]));
-      
-      setSaveMsg({ type: "ok", text: `✓ ${withMeta.length} question(s) saved to localStorage and local data folder.` });
-      setJsonInput(""); setParseSuccess(false); setSetName(""); loadStored();
-    } catch (e) {
-      setSaveMsg({ type: "error", text: (e as Error).message || "Failed to save. Please re-validate." });
-    } finally { setSaving(false); }
-  };
+      // 2. Refresh is no longer loading stored locally to display, but we can reset form
 
-  // ── Delete ───────────────────────────────────────────────────────────
-  const handleDelete = (id: string) => {
-    const updated = stored.filter((q) => q.id !== id);
-    localStorage.setItem("quiz_questions", JSON.stringify(updated));
-    setStored(updated); setDeleteConfirm(null);
+      setSaveMsg({
+        type: "ok",
+        text: `✓ ${withMeta.length} question(s) saved to localStorage and local data folder.`,
+      });
+      setJsonInput("");
+      setParseSuccess(false);
+      setSetName("");
+    } catch (e) {
+      setSaveMsg({
+        type: "error",
+        text: (e as Error).message || "Failed to save. Please re-validate.",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // ── Derived ──────────────────────────────────────────────────────────
   const previewPath = `questions/${toSlug(subject)}/${toSlug(topic || "topic")}/${setName.trim().replace(/\s+/g, "-") || "<set-name>"}`;
-
-  const filteredStored = stored.filter((q) => {
-    if (viewSubject !== "__ALL__" && q.subject !== viewSubject) return false;
-    if (viewTopic !== "__ALL__" && q.topic !== viewTopic) return false;
-    return true;
-  });
-
-  // Unique subjects/topics in stored
-  const storedSubjects = [...new Set(stored.map((q) => q.subject))];
-  const storedTopicsForSubject = viewSubject === "__ALL__"
-    ? [...new Set(stored.map((q) => q.topic))]
-    : [...new Set(stored.filter((q) => q.subject === viewSubject).map((q) => q.topic))];
-
-  // Group by set for current view
-  const grouped: Record<string, QuizQuestion[]> = {};
-  for (const q of filteredStored) {
-    const key = `${q.subject} › ${q.topic} › ${q.set}`;
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(q);
-  }
 
   // ── Render ───────────────────────────────────────────────────────────
   return (
@@ -315,43 +405,23 @@ export default function QuestionsAdminPage() {
             Upload Questions
           </h1>
           <p className="text-sm text-secondary mt-1">
-            Subject / Topic / Set चुनें, JSON paste करें, validate करें और localStorage में save करें।
+            Subject / Topic / Set चुनें, JSON paste करें, validate करें और
+            localStorage में save करें।
           </p>
         </header>
 
         {/* JSON Paste Area */}
         <div className="max-w-3xl space-y-8">
           <section className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="font-headline font-bold text-on-surface text-base">
-                Paste Question JSON
-              </label>
-              <button
-                onClick={() => setJsonInput(SAMPLE_JSON)}
-                className="text-[11px] font-bold text-primary hover:underline underline-offset-2"
-              >
-                Insert template
-              </button>
-            </div>
-
-            {/* Format hint */}
-            <div className="bg-surface-container rounded-xl px-4 py-3 text-xs text-secondary font-mono leading-relaxed">
-              <p className="font-bold text-on-surface-variant mb-1 text-[11px] uppercase tracking-wider font-sans not-italic">
-                Expected format
-              </p>
-              {`[{ "id": "q001", "question": "...", "options": ["A","B","C","D"], "correctAnswer": "A", "explanation": "..." }]`}
-              <br />
-              <span className="text-[10px] italic font-sans text-secondary">
-                — <code>subject</code>, <code>topic</code>, <code>set</code> auto-injected from Classification panel.{" "}
-                <code>id</code> and <code>explanation</code> are optional.
-              </span>
-            </div>
-
             {/* Textarea */}
             <div
               className={cn(
                 "rounded-xl ring-1 ring-inset overflow-hidden",
-                parseError ? "ring-error/50" : parseSuccess ? "ring-primary/40" : "ring-outline-variant/30"
+                parseError
+                  ? "ring-error/50"
+                  : parseSuccess
+                    ? "ring-primary/40"
+                    : "ring-outline-variant/30",
               )}
             >
               <div className="flex items-center justify-between px-4 py-2 bg-surface-container text-[11px] text-secondary border-b border-outline-variant/10">
@@ -361,7 +431,12 @@ export default function QuestionsAdminPage() {
               <textarea
                 id="json-input"
                 value={jsonInput}
-                onChange={(e) => { setJsonInput(e.target.value); setParseSuccess(false); setParseError(""); setSaveMsg(null); }}
+                onChange={(e) => {
+                  setJsonInput(e.target.value);
+                  setParseSuccess(false);
+                  setParseError("");
+                  setSaveMsg(null);
+                }}
                 placeholder={SAMPLE_JSON}
                 className="w-full bg-surface-container-lowest border-none outline-none p-5 min-h-[260px] text-sm font-mono text-on-surface resize-y leading-relaxed"
                 spellCheck={false}
@@ -371,7 +446,10 @@ export default function QuestionsAdminPage() {
             {/* Feedback */}
             {parseError && (
               <div className="flex items-start gap-2 p-3 bg-error-container/20 border border-error/20 rounded-xl text-sm text-error">
-                <MaterialIcon name="error" className="text-base shrink-0 mt-0.5" />
+                <MaterialIcon
+                  name="error"
+                  className="text-base shrink-0 mt-0.5"
+                />
                 <span>{parseError}</span>
               </div>
             )}
@@ -379,31 +457,31 @@ export default function QuestionsAdminPage() {
               <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-xl text-sm text-primary">
                 <MaterialIcon name="check_circle" className="text-base" />
                 <span>
-                  JSON valid &mdash; {validatedCount} question{validatedCount !== 1 ? "s" : ""} ready to save
-                  to &ldquo;{subject} &rsaquo; {topic} &rsaquo; {setName}&rdquo;
+                  JSON valid &mdash; {validatedCount} question
+                  {validatedCount !== 1 ? "s" : ""} ready to save to &ldquo;
+                  {subject} &rsaquo; {topic} &rsaquo; {setName}&rdquo;
                 </span>
               </div>
             )}
             {saveMsg && (
-              <div className={cn("flex items-start gap-2 p-3 rounded-xl text-sm border",
-                saveMsg.type === "ok" ? "bg-primary/5 border-primary/20 text-primary" : "bg-error-container/20 border-error/20 text-error"
-              )}>
-                <MaterialIcon name={saveMsg.type === "ok" ? "check_circle" : "error"} className="text-base shrink-0 mt-0.5" />
+              <div
+                className={cn(
+                  "flex items-start gap-2 p-3 rounded-xl text-sm border",
+                  saveMsg.type === "ok"
+                    ? "bg-primary/5 border-primary/20 text-primary"
+                    : "bg-error-container/20 border-error/20 text-error",
+                )}
+              >
+                <MaterialIcon
+                  name={saveMsg.type === "ok" ? "check_circle" : "error"}
+                  className="text-base shrink-0 mt-0.5"
+                />
                 <span>{saveMsg.text}</span>
               </div>
             )}
 
             {/* Buttons */}
             <div className="flex gap-3">
-              <button
-                id="btn-validate"
-                onClick={handleValidate}
-                disabled={!jsonInput.trim()}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant/30 text-sm font-bold text-on-surface hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                <MaterialIcon name="verified" className="text-base" />
-                Validate JSON
-              </button>
               {parseSuccess && (
                 <button
                   id="btn-save"
@@ -412,15 +490,26 @@ export default function QuestionsAdminPage() {
                   className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:shadow-lg hover:shadow-primary/20 active:scale-95 disabled:opacity-60 transition-all"
                 >
                   {saving ? (
-                    <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Saving…</>
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving…
+                    </>
                   ) : (
-                    <><MaterialIcon name="save" className="text-base" />Save to localStorage</>
+                    <>
+                      <MaterialIcon name="save" className="text-base" />
+                      Save to localStorage
+                    </>
                   )}
                 </button>
               )}
               {jsonInput && (
                 <button
-                  onClick={() => { setJsonInput(""); setParseSuccess(false); setParseError(""); setSaveMsg(null); }}
+                  onClick={() => {
+                    setJsonInput("");
+                    setParseSuccess(false);
+                    setParseError("");
+                    setSaveMsg(null);
+                  }}
                   className="ml-auto flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm text-secondary hover:bg-surface-container transition-colors"
                 >
                   <MaterialIcon name="close" className="text-base" />
@@ -432,131 +521,6 @@ export default function QuestionsAdminPage() {
 
           {/* ── AI Prompt Generator ── */}
           <AiPromptSection subject={subject} topic={topic} />
-
-          {/* ── Stored Questions Panel ── */}
-          <section className="space-y-4 pt-8 border-t border-outline-variant/20">
-            <div className="flex items-center gap-2">
-              <MaterialIcon name="list_alt" className="text-primary" />
-              <h2 className="font-headline font-bold text-on-surface text-base">
-                Stored Questions
-              </h2>
-              <span className="text-xs text-secondary">({stored.length} total)</span>
-            </div>
-
-            {/* Subject filter */}
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => { setViewSubject("__ALL__"); setViewTopic("__ALL__"); }}
-                className={cn("px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                  viewSubject === "__ALL__" ? "bg-primary text-white" : "bg-surface-container text-secondary hover:bg-surface-container-high")}
-              >
-                All ({stored.length})
-              </button>
-              {storedSubjects.map((s) => (
-                <button key={s} onClick={() => { setViewSubject(s); setViewTopic("__ALL__"); }}
-                  className={cn("px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                    viewSubject === s ? "bg-primary text-white" : "bg-surface-container text-secondary hover:bg-surface-container-high")}
-                >
-                  {s} ({stored.filter((q) => q.subject === s).length})
-                </button>
-              ))}
-            </div>
-
-            {/* Topic filter */}
-            {viewSubject !== "__ALL__" && storedTopicsForSubject.length > 0 && (
-              <div className="flex flex-wrap gap-2 pl-4 border-l-2 border-primary/20">
-                <button
-                  onClick={() => setViewTopic("__ALL__")}
-                  className={cn("px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                    viewTopic === "__ALL__" ? "bg-secondary-container text-on-surface" : "bg-surface-container text-secondary hover:bg-surface-container-high")}
-                >
-                  All Topics
-                </button>
-                {storedTopicsForSubject.map((t) => (
-                  <button key={t} onClick={() => setViewTopic(t)}
-                    className={cn("px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                      viewTopic === t ? "bg-secondary-container text-on-surface" : "bg-surface-container text-secondary hover:bg-surface-container-high")}
-                  >
-                    {t} ({stored.filter((q) => q.subject === viewSubject && q.topic === t).length})
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Groups */}
-            {Object.keys(grouped).length === 0 ? (
-              <div className="text-center py-12 text-secondary">
-                <MaterialIcon name="inbox" className="text-4xl text-outline mb-3" />
-                <p className="text-sm">No questions stored yet.</p>
-                <p className="text-xs mt-1">Paste JSON above, validate, and save.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {Object.entries(grouped).map(([groupKey, questions]) => {
-                  const [, gTopic, gSet] = groupKey.split(" › ");
-                  return (
-                    <div key={groupKey} className="rounded-2xl border border-outline-variant/20 overflow-hidden">
-                      {/* Group header */}
-                      <div className="flex items-center justify-between px-5 py-3 bg-surface-container border-b border-outline-variant/10">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs font-bold text-secondary">{gTopic}</span>
-                          <MaterialIcon name="chevron_right" className="text-sm text-outline" />
-                          <span className="text-sm font-headline font-bold text-on-surface">{gSet}</span>
-                          <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full">
-                            {questions.length} Q
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => {
-                            const updated = stored.filter((q) => !(q.topic === gTopic && q.set === gSet));
-                            localStorage.setItem("quiz_questions", JSON.stringify(updated));
-                            setStored(updated);
-                          }}
-                          className="flex items-center gap-1 text-xs text-error font-bold hover:bg-error-container/20 px-2 py-1 rounded-lg transition-colors"
-                        >
-                          <MaterialIcon name="delete_sweep" className="text-sm" />
-                          Clear set
-                        </button>
-                      </div>
-                      {/* Questions */}
-                      <div className="divide-y divide-outline-variant/10">
-                        {questions.map((q, idx) => (
-                          <div key={q.id} className="group relative flex items-start gap-3 p-4 hover:bg-surface-container/50 transition-colors pr-12">
-                            <span className="shrink-0 w-7 h-7 rounded-lg bg-surface-container-low flex items-center justify-center text-[11px] font-bold text-secondary">
-                              {idx + 1}
-                            </span>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-on-surface leading-relaxed mb-1.5">
-                                {q.question}
-                              </p>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">Answer:</span>
-                                <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded-lg">{q.answer}</span>
-                              </div>
-                            </div>
-                            {/* Delete */}
-                            {deleteConfirm === q.id ? (
-                              <div className="absolute top-3 right-3 flex gap-1">
-                                <button onClick={() => handleDelete(q.id)} className="px-2 py-1 bg-error text-white text-[10px] font-bold rounded-lg">Confirm</button>
-                                <button onClick={() => setDeleteConfirm(null)} className="px-2 py-1 bg-surface-container-high text-secondary text-[10px] font-bold rounded-lg">Cancel</button>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setDeleteConfirm(q.id)}
-                                className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/20 opacity-0 group-hover:opacity-100 transition-all"
-                              >
-                                <MaterialIcon name="delete" className="text-sm" />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
         </div>
       </main>
 
@@ -564,7 +528,9 @@ export default function QuestionsAdminPage() {
       <aside className="w-72 shrink-0 border-l border-outline-variant/20 bg-surface-container-low p-7 flex flex-col gap-6 overflow-y-auto sticky top-0 h-screen">
         <div className="flex items-center gap-2">
           <MaterialIcon name="category" className="text-primary" />
-          <h2 className="font-headline font-bold text-on-surface text-base">Classification</h2>
+          <h2 className="font-headline font-bold text-on-surface text-base">
+            Classification
+          </h2>
         </div>
 
         {/* Subject */}
@@ -623,9 +589,15 @@ export default function QuestionsAdminPage() {
             className="w-full py-4 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
           >
             {saving ? (
-              <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Saving…</>
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving…
+              </>
             ) : (
-              <><MaterialIcon name={parseSuccess ? "save" : "verified"} />{parseSuccess ? "Save to localStorage" : "Validate JSON"}</>
+              <>
+                <MaterialIcon name={parseSuccess ? "save" : "verified"} />
+                {parseSuccess ? "Save to localStorage" : "Validate JSON"}
+              </>
             )}
           </button>
         </div>
@@ -635,7 +607,13 @@ export default function QuestionsAdminPage() {
 }
 
 // ── AI Prompt Generator Component ──────────────────────────────────────────
-function AiPromptSection({ subject, topic }: { subject: string; topic: string }) {
+function AiPromptSection({
+  subject,
+  topic,
+}: {
+  subject: string;
+  topic: string;
+}) {
   const [count, setCount] = useState(10);
   const [copied, setCopied] = useState(false);
 
@@ -673,18 +651,23 @@ Rules:
     <section className="space-y-4 pt-8 border-t border-outline-variant/20">
       <div className="flex items-center gap-2">
         <MaterialIcon name="auto_awesome" className="text-primary" />
-        <h2 className="font-headline font-bold text-on-surface text-base">AI Prompt Generator</h2>
+        <h2 className="font-headline font-bold text-on-surface text-base">
+          AI Prompt Generator
+        </h2>
         <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full">
           ChatGPT / Gemini
         </span>
       </div>
       <p className="text-xs text-secondary leading-relaxed">
-        किसी भी AI tool को यह prompt दें — वो exact JSON format में questions बनाएगा जो directly paste और save की जा सकती है।
+        किसी भी AI tool को यह prompt दें — वो exact JSON format में questions
+        बनाएगा जो directly paste और save की जा सकती है।
       </p>
 
       {/* Count selector */}
       <div className="flex items-center gap-3">
-        <label className="text-xs font-semibold text-secondary">Questions to generate:</label>
+        <label className="text-xs font-semibold text-secondary">
+          Questions to generate:
+        </label>
         <div className="flex gap-1.5">
           {[5, 10, 15, 20, 25].map((n) => (
             <button
@@ -692,7 +675,9 @@ Rules:
               onClick={() => setCount(n)}
               className={cn(
                 "w-10 h-8 rounded-lg text-xs font-bold transition-all",
-                count === n ? "bg-primary text-white" : "bg-surface-container text-secondary hover:bg-surface-container-high"
+                count === n
+                  ? "bg-primary text-white"
+                  : "bg-surface-container text-secondary hover:bg-surface-container-high",
               )}
             >
               {n}
@@ -712,18 +697,21 @@ Rules:
             "absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
             copied
               ? "bg-primary text-white shadow-md"
-              : "bg-surface-container-high text-secondary hover:bg-primary hover:text-white"
+              : "bg-surface-container-high text-secondary hover:bg-primary hover:text-white",
           )}
         >
-          <MaterialIcon name={copied ? "check" : "content_copy"} className="text-sm" />
+          <MaterialIcon
+            name={copied ? "check" : "content_copy"}
+            className="text-sm"
+          />
           {copied ? "Copied!" : "Copy Prompt"}
         </button>
       </div>
 
       <p className="text-[10px] text-secondary italic">
-        💡 Tip: Copy → ChatGPT / Gemini → paste response back into JSON editor above → Validate → Save
+        💡 Tip: Copy → ChatGPT / Gemini → paste response back into JSON editor
+        above → Validate → Save
       </p>
     </section>
   );
 }
-

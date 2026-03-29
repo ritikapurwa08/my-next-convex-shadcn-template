@@ -11,7 +11,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hideRightSidebar = pathname === "/admin/questions";
+  const segments = pathname.split("/").filter(Boolean);
+  const isQuizInterface = segments[0] === "quiz" && segments.length >= 4;
+  
+  const hideRightSidebar = pathname === "/admin/questions" || pathname === "/admin/stored";
+  const hideLayoutRightSidebar = hideRightSidebar || isQuizInterface;
 
   return (
     <div className="flex min-h-screen">
@@ -24,7 +28,7 @@ export default function DashboardLayout({
       </main>
 
       {/* Right Quick Stats */}
-      {!hideRightSidebar && <RightSidebar />}
+      {!hideLayoutRightSidebar && <RightSidebar />}
     </div>
   );
 }
