@@ -411,7 +411,7 @@ export default function QuestionsAdminPage() {
         </header>
 
         {/* JSON Paste Area */}
-        <div className="max-w-3xl space-y-8">
+        <div className="w-full max-w-5xl 2xl:max-w-7xl space-y-8">
           <section className="space-y-3">
             {/* Textarea */}
             <div

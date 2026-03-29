@@ -68,7 +68,6 @@ export default function QuizSetPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-
   // ── Load questions ───────────────────────────────────────────────────
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -186,7 +185,7 @@ export default function QuizSetPage() {
   // ── Loading ───────────────────────────────────────────────────────────
   if (!isLoaded) {
     return (
-      <div className="max-w-4xl mx-auto py-6 space-y-4 animate-pulse">
+      <div className="w-full max-w-5xl 2xl:max-w-6xl py-6 space-y-4 animate-pulse">
         <div className="h-24 bg-surface-container rounded-2xl" />
         <div className="h-2 bg-surface-container rounded-full" />
         <div className="h-64 bg-surface-container rounded-3xl" />
@@ -221,25 +220,37 @@ export default function QuizSetPage() {
   // ── Quiz UI ────────────────────────────────────────────────────────────
   return (
     <>
-      <div className="max-w-3xl animate-in fade-in zoom-in-95 duration-500 pb-20">
+      <div className="w-full max-w-5xl 2xl:max-w-6xl animate-in fade-in zoom-in-95 duration-500">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-secondary mb-8 flex-wrap">
-          <button onClick={() => router.push("/")} className="hover:text-on-surface transition-colors">Dashboard</button>
+          <button
+            onClick={() => router.push("/")}
+            className="hover:text-on-surface transition-colors"
+          >
+            Dashboard
+          </button>
           <MaterialIcon name="chevron_right" className="text-sm text-outline" />
-          <button onClick={() => router.push(`/quiz/${subjectSlug}`)} className="hover:text-on-surface transition-colors">{labels.subject}</button>
+          <button
+            onClick={() => router.push(`/quiz/${subjectSlug}`)}
+            className="hover:text-on-surface transition-colors"
+          >
+            {labels.subject}
+          </button>
           <MaterialIcon name="chevron_right" className="text-sm text-outline" />
-          <button onClick={() => router.push(`/quiz/${subjectSlug}/${topicSlug}`)} className="hover:text-on-surface transition-colors">{labels.topic}</button>
+          <button
+            onClick={() => router.push(`/quiz/${subjectSlug}/${topicSlug}`)}
+            className="hover:text-on-surface transition-colors"
+          >
+            {labels.topic}
+          </button>
           <MaterialIcon name="chevron_right" className="text-sm text-outline" />
-          <span className="text-on-surface font-medium font-mono">{labels.set}</span>
+          <span className="text-on-surface font-medium font-mono">
+            {labels.set}
+          </span>
         </nav>
 
         {/* Main area */}
         <div className="flex-1 min-w-0">
-          <div className="mb-6 space-y-2">
-            <h1 className="text-sm font-label font-bold text-secondary uppercase tracking-[0.15em]">{labels.topic}</h1>
-            <h2 className="text-3xl font-headline font-extrabold text-on-surface">{labels.set}</h2>
-          </div>
-
           {/* Question card */}
           <div className="bg-surface-container-lowest rounded-3xl p-8 md:p-10 shadow-lg shadow-primary/5 border border-primary/10 mb-6">
             <div className="flex items-start gap-3 mb-8">
@@ -257,21 +268,42 @@ export default function QuizSetPage() {
                 return (
                   <button
                     key={idx}
-                    onClick={() => setAnswers((prev) => ({ ...prev, [current]: option }))}
+                    onClick={() =>
+                      setAnswers((prev) => ({ ...prev, [current]: option }))
+                    }
                     className={cn(
-                      "group w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer",
-                      isSelected ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-surface-container hover:border-primary/40 hover:bg-surface-container/50",
+                      "group w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-150 ease-in-out cursor-pointer",
+                      isSelected
+                        ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
+                        : "border-surface-container hover:border-primary/40 hover:bg-surface-container/50",
                     )}
                   >
-                    <span className={cn(
-                      "shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-hindi font-bold text-sm transition-colors",
-                      isSelected ? "bg-primary text-white" : "bg-surface-container-low text-secondary group-hover:bg-primary/10 group-hover:text-primary",
-                    )}>{letter}</span>
-                    <span className={cn(
-                      "font-body text-sm leading-relaxed transition-colors",
-                      isSelected ? "text-primary font-semibold" : "text-on-surface-variant group-hover:text-on-surface",
-                    )}>{option}</span>
-                    {isSelected && <MaterialIcon name="check_circle" className="ml-auto text-primary text-lg shrink-0" />}
+                    <span
+                      className={cn(
+                        "shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-hindi font-bold text-sm transition-colors",
+                        isSelected
+                          ? "bg-primary text-white"
+                          : "bg-surface-container-low text-secondary group-hover:bg-primary/10 group-hover:text-primary",
+                      )}
+                    >
+                      {letter}
+                    </span>
+                    <span
+                      className={cn(
+                        "font-body text-sm leading-relaxed transition-colors",
+                        isSelected
+                          ? "text-primary "
+                          : "text-on-surface-variant group-hover:text-on-surface",
+                      )}
+                    >
+                      {option}
+                    </span>
+                    {isSelected && (
+                      <MaterialIcon
+                        name="check_circle"
+                        className="ml-auto text-primary text-lg shrink-0"
+                      />
+                    )}
                   </button>
                 );
               })}
@@ -292,7 +324,9 @@ export default function QuizSetPage() {
 
             <button
               id="btn-next"
-              onClick={() => setCurrent((c) => Math.min(questions.length - 1, c + 1))}
+              onClick={() =>
+                setCurrent((c) => Math.min(questions.length - 1, c + 1))
+              }
               disabled={current === questions.length - 1}
               className="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
@@ -309,34 +343,77 @@ export default function QuizSetPage() {
           <MaterialIcon name="timer" className="text-secondary" />
           Quiz Status
         </h4>
-        
-        <div className="space-y-6 flex-1">
-          {/* Timer Card */}
-          <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-secondary mb-1 block">Time Left</span>
-            <div className={cn("flex items-center gap-2 font-headline font-bold text-3xl tabular-nums", timerDanger ? "text-error animate-pulse" : "text-on-surface")}>
-              {formatTime(timeLeft)}
-            </div>
-          </div>
 
-          {/* Progress Card */}
-          <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block">Progress</span>
-              <span className="font-headline font-bold text-sm text-on-surface">{current + 1} of {questions.length}</span>
+        <div className="space-y-6 flex-1">
+          <div className="mb-6 space-y-2">
+            <h1 className="text-sm font-label font-bold text-secondary uppercase tracking-[0.15em]">
+              {labels.topic}
+            </h1>
+            <h2 className="text-sm font-headline font-extrabold text-on-surface">
+              {labels.set}
+            </h2>
+          </div>
+          {/* Metrics & Progress Card */}
+          <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 shadow-sm relative overflow-hidden">
+            {/* Soft background glow */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+
+            <div className="grid grid-cols-2 gap-4 divide-x divide-outline-variant/10 mb-5 relative z-10">
+              {/* Timer */}
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block mb-1">
+                  Time Left
+                </span>
+                <div
+                  className={cn(
+                    "font-headline font-bold text-2xl tabular-nums mt-0.5",
+                    timerDanger
+                      ? "text-error animate-pulse"
+                      : "text-on-surface",
+                  )}
+                >
+                  {formatTime(timeLeft)}
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="pl-4">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block mb-1">
+                  Answered
+                </span>
+                <div className="font-headline font-bold text-2xl text-on-surface tabular-nums flex items-baseline gap-1 mt-0.5">
+                  <span className="text-primary">{answeredCount}</span>
+                  <span className="text-sm text-secondary font-medium">
+                    / {questions.length}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden mb-4">
-              <div className="h-full bg-primary transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
-            </div>
-            <div className="flex items-center justify-between pt-2 border-t border-outline-variant/10">
-               <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block">Answered</span>
-               <span className="font-headline font-bold text-sm text-primary">{answeredCount}</span>
+
+            {/* Progress Bar */}
+            <div className="pt-4 border-t border-outline-variant/10 relative z-10">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block">
+                  Progress
+                </span>
+                <span className="text-[10px] font-bold text-secondary">
+                  {Math.round(progress)}%
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-500 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
             </div>
           </div>
 
           {/* Palette */}
           <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-secondary mb-4">Question Palette</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-secondary mb-4">
+              Question Palette
+            </p>
             <div className="grid grid-cols-5 gap-1.5">
               {questions.map((_, i) => {
                 const isAnswered = answers[i] !== undefined;
@@ -370,9 +447,15 @@ export default function QuizSetPage() {
           className="mt-6 w-full flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-40 transition-all font-headline"
         >
           {isSubmitting ? (
-            <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Submitting…</>
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Submitting…
+            </>
           ) : (
-            <>Submit Quiz<MaterialIcon name="check_circle" className="text-lg" /></>
+            <>
+              Submit Quiz
+              <MaterialIcon name="check_circle" className="text-lg" />
+            </>
           )}
         </button>
       </aside>
