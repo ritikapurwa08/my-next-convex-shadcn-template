@@ -301,39 +301,34 @@ export default function QuestionsAdminPage() {
     setTopic(t);
   };
 
-  // ── Validate ─────────────────────────────────────────────────────────
-  const handleValidate = () => {
+  // ── Save (Validate & Save) ───────────────────────────────────────────
+  const handleSave = async () => {
     setParseError("");
     setParseSuccess(false);
     setSaveMsg(null);
     if (!setName.trim()) {
-      setParseError("Set Name is required before validating.");
+      setParseError("Set Name is required before saving.");
       return;
     }
+
+    let parsed: RawInputQuestion[];
     try {
-      const parsed = JSON.parse(jsonInput);
-      const result = validateInput(parsed);
+      const parsedJson = JSON.parse(jsonInput);
+      const result = validateInput(parsedJson);
       if (!result.valid) {
         setParseError(result.error);
         return;
       }
+      parsed = result.questions;
       setParseSuccess(true);
-      setValidatedCount(result.questions.length);
+      setValidatedCount(parsed.length);
     } catch (e) {
       setParseError(`Invalid JSON: ${(e as Error).message}`);
-    }
-  };
-
-  // ── Save ─────────────────────────────────────────────────────────────
-  const handleSave = async () => {
-    if (!parseSuccess) {
-      handleValidate();
       return;
     }
+
     setSaving(true);
-    setSaveMsg(null);
     try {
-      const parsed: RawInputQuestion[] = JSON.parse(jsonInput);
       const withMeta: QuizQuestion[] = parsed.map((q) => ({
         id: q.id ?? crypto.randomUUID(),
         subject,
@@ -366,7 +361,14 @@ export default function QuestionsAdminPage() {
       const apiData = await res.json();
       if (!res.ok) throw new Error(apiData.error || "Local API save failed");
 
-      // 2. Refresh is no longer loading stored locally to display, but we can reset form
+      // 2. Save directly to localStorage so they appear on the Dashboard
+      try {
+        const existing = JSON.parse(localStorage.getItem("quiz_questions") || "[]");
+        const updated = [...existing, ...withMeta];
+        localStorage.setItem("quiz_questions", JSON.stringify(updated));
+      } catch (e) {
+        console.error("Local storage save failed", e);
+      }
 
       setSaveMsg({
         type: "ok",
@@ -378,7 +380,7 @@ export default function QuestionsAdminPage() {
     } catch (e) {
       setSaveMsg({
         type: "error",
-        text: (e as Error).message || "Failed to save. Please re-validate.",
+        text: (e as Error).message || "Failed to save. Please try again.",
       });
     } finally {
       setSaving(false);
@@ -482,26 +484,6 @@ export default function QuestionsAdminPage() {
 
             {/* Buttons */}
             <div className="flex gap-3">
-              {parseSuccess && (
-                <button
-                  id="btn-save"
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:shadow-lg hover:shadow-primary/20 active:scale-95 disabled:opacity-60 transition-all"
-                >
-                  {saving ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Saving…
-                    </>
-                  ) : (
-                    <>
-                      <MaterialIcon name="save" className="text-base" />
-                      Save to localStorage
-                    </>
-                  )}
-                </button>
-              )}
               {jsonInput && (
                 <button
                   onClick={() => {
@@ -513,7 +495,7 @@ export default function QuestionsAdminPage() {
                   className="ml-auto flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm text-secondary hover:bg-surface-container transition-colors"
                 >
                   <MaterialIcon name="close" className="text-base" />
-                  Clear
+                  Clear JSON
                 </button>
               )}
             </div>
@@ -584,19 +566,19 @@ export default function QuestionsAdminPage() {
         {/* Save button */}
         <div className="mt-auto pt-4 border-t border-outline-variant/20">
           <button
-            onClick={parseSuccess ? handleSave : handleValidate}
+            onClick={handleSave}
             disabled={saving || !jsonInput.trim()}
             className="w-full py-4 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
           >
             {saving ? (
               <>
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Saving…
+                Validating & Saving…
               </>
             ) : (
               <>
-                <MaterialIcon name={parseSuccess ? "save" : "verified"} />
-                {parseSuccess ? "Save to localStorage" : "Validate JSON"}
+                <MaterialIcon name="save" />
+                Validate & Save
               </>
             )}
           </button>

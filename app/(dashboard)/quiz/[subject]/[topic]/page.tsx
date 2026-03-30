@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { cn } from "@/lib/utils";
@@ -14,66 +14,107 @@ interface QuizQuestion {
 }
 
 function toSlug(s: string) {
-  return s.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 }
 
 function fromSlug(slug: string) {
   return slug.replace(/-/g, " ");
 }
 
+const emptySubscribe = () => () => {};
+
 export default function TopicPage() {
   const params = useParams();
   const router = useRouter();
-  const subjectSlug = Array.isArray(params.subject) ? params.subject[0] : (params.subject ?? "");
-  const topicSlug = Array.isArray(params.topic) ? params.topic[0] : (params.topic ?? "");
+  const subjectSlug = Array.isArray(params.subject)
+    ? params.subject[0]
+    : (params.subject ?? "");
+  const topicSlug = Array.isArray(params.topic)
+    ? params.topic[0]
+    : (params.topic ?? "");
 
-  // Load from localStorage once at mount using lazy initializer
-  const [allQuestions] = useState<QuizQuestion[]>(() => {
-    if (typeof window === "undefined") return [];
-    return JSON.parse(localStorage.getItem("quiz_questions") || "[]");
-  });
-  const [isLoaded] = useState(true);
-
-  // All derived state computed via useMemo — no setState in effect
-  const { subjectLabel, topicLabel, sets } = useMemo(() => {
-    const allSubjects = [...new Set(allQuestions.map((q) => q.subject))];
-    const matchedSubject = allSubjects.find((s) => toSlug(s) === subjectSlug)
-      ?? fromSlug(subjectSlug);
-
-    const subjectQs = allQuestions.filter((q) => toSlug(q.subject) === subjectSlug);
-    const allTopics = [...new Set(subjectQs.map((q) => q.topic))];
-    const matchedTopic = allTopics.find((t) => toSlug(t) === topicSlug) ?? fromSlug(topicSlug);
-
-    const topicQs = subjectQs.filter((q) => toSlug(q.topic) === topicSlug);
-    const setNames = [...new Set(topicQs.map((q) => q.set))];
-    const computedSets = setNames.map((s) => ({
-      name: s,
-      questionCount: topicQs.filter((q) => q.set === s).length,
-    }));
-
-    return { subjectLabel: matchedSubject, topicLabel: matchedTopic, sets: computedSets };
-  }, [allQuestions, subjectSlug, topicSlug]);
+  const isLoaded = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   if (!isLoaded) {
     return (
       <div className="max-w-4xl mx-auto py-6 space-y-4 animate-pulse">
         <div className="h-16 bg-surface-container rounded-2xl" />
         <div className="grid grid-cols-2 gap-4">
-          {[1, 2].map(i => <div key={i} className="h-32 bg-surface-container rounded-2xl" />)}
+          {[1, 2].map((i) => (
+            <div key={i} className="h-32 bg-surface-container rounded-2xl" />
+          ))}
         </div>
       </div>
     );
   }
 
+  const allQuestions: QuizQuestion[] =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("quiz_questions") || "[]")
+      : [];
+
+  const allSubjects = [...new Set(allQuestions.map((q) => q.subject))];
+  const matchedSubject =
+    allSubjects.find((s) => toSlug(s) === subjectSlug) ??
+    allSubjects.find(
+      (s) => s.toLowerCase() === fromSlug(subjectSlug).toLowerCase(),
+    ) ??
+    fromSlug(subjectSlug);
+
+  const subjectQs = allQuestions.filter(
+    (q) =>
+      toSlug(q.subject) === subjectSlug ||
+      q.subject.toLowerCase() === fromSlug(subjectSlug).toLowerCase(),
+  );
+  const allTopics = [...new Set(subjectQs.map((q) => q.topic))];
+  const matchedTopic =
+    allTopics.find((t) => toSlug(t) === topicSlug) ??
+    allTopics.find(
+      (t) => t.toLowerCase() === fromSlug(topicSlug).toLowerCase(),
+    ) ??
+    fromSlug(topicSlug);
+
+  const topicQs = subjectQs.filter(
+    (q) =>
+      toSlug(q.topic) === topicSlug ||
+      q.topic.toLowerCase() === fromSlug(topicSlug).toLowerCase(),
+  );
+  const setNames = [...new Set(topicQs.map((q) => q.set))];
+  const computedSets = setNames.map((s) => ({
+    name: s,
+    questionCount: topicQs.filter((q) => q.set === s).length,
+  }));
+
+  const subjectLabel = matchedSubject;
+  const topicLabel = matchedTopic;
+  const sets = computedSets;
+
   return (
     <div className="max-w-4xl mx-auto py-6 animate-in fade-in zoom-in-95 duration-500">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-secondary mb-6" aria-label="breadcrumb">
-        <button onClick={() => router.push("/")} className="hover:text-on-surface transition-colors">
+      <nav
+        className="flex items-center gap-2 text-sm text-secondary mb-6"
+        aria-label="breadcrumb"
+      >
+        <button
+          onClick={() => router.push("/")}
+          className="hover:text-on-surface transition-colors"
+        >
           Dashboard
         </button>
         <MaterialIcon name="chevron_right" className="text-base text-outline" />
-        <button onClick={() => router.push(`/quiz/${subjectSlug}`)} className="hover:text-on-surface transition-colors capitalize">
+        <button
+          onClick={() => router.push(`/quiz/${subjectSlug}`)}
+          className="hover:text-on-surface transition-colors capitalize"
+        >
           {subjectLabel}
         </button>
         <MaterialIcon name="chevron_right" className="text-base text-outline" />
@@ -103,7 +144,9 @@ export default function TopicPage() {
           <div className="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center mx-auto mb-4">
             <MaterialIcon name="inbox" className="text-3xl text-secondary" />
           </div>
-          <h2 className="text-lg font-headline font-bold text-on-surface mb-2">No Sets Yet</h2>
+          <h2 className="text-lg font-headline font-bold text-on-surface mb-2">
+            No Sets Yet
+          </h2>
           <p className="text-secondary text-sm mb-6">
             No question sets have been uploaded for this topic.
           </p>
@@ -139,11 +182,15 @@ export default function TopicPage() {
                   </p>
 
                   <button
-                    onClick={() => router.push(`/quiz/${subjectSlug}/${topicSlug}/${setSlug}`)}
+                    onClick={() =>
+                      router.push(
+                        `/quiz/${subjectSlug}/${topicSlug}/${setSlug}`,
+                      )
+                    }
                     className={cn(
                       "w-full flex items-center justify-center gap-2 py-3 px-5",
                       "bg-primary text-white font-bold rounded-xl text-sm",
-                      "hover:shadow-lg hover:shadow-primary/30 active:scale-95 transition-all"
+                      "hover:shadow-lg hover:shadow-primary/30 active:scale-95 transition-all",
                     )}
                   >
                     Start Quiz
@@ -153,8 +200,8 @@ export default function TopicPage() {
 
                 <div className="px-6 pb-4">
                   <div className="flex items-center gap-2 text-[10px] text-secondary">
-                    <MaterialIcon name="schedule" className="text-xs" />
-                    ~{Math.ceil(s.questionCount * 1.5)} min estimated
+                    <MaterialIcon name="schedule" className="text-xs" />~
+                    {Math.ceil(s.questionCount * 1.5)} min estimated
                   </div>
                 </div>
               </div>
