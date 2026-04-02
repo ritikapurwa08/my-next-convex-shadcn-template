@@ -9,6 +9,7 @@ import { useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/", icon: "dashboard" },
@@ -118,20 +119,24 @@ export default function Sidebar() {
           </div>
         </div>
 
-        <button
-          onClick={handleLogout}
-          disabled={loggingOut}
-          className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-error font-medium hover:bg-error-container/20 transition-all w-full text-left disabled:opacity-60"
-        >
-          {loggingOut ? (
-            <span className="w-4 h-4 border-2 border-error border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <MaterialIcon name="logout" className="text-sm" />
-          )}
-          <span className="text-xs font-body">
-            {loggingOut ? "Logging out…" : "Logout"}
-          </span>
-        </button>
+        <div className="flex items-center gap-2 w-full">
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="flex items-center gap-x-3 px-3 py-2 rounded-xl text-error font-medium hover:bg-error-container/20 transition-all flex-1 text-left disabled:opacity-60"
+          >
+            {loggingOut ? (
+              <span className="w-4 h-4 border-2 border-error border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <MaterialIcon name="logout" className="text-sm" />
+            )}
+            <span className="text-xs font-body">
+              {loggingOut ? "Logging out…" : "Logout"}
+            </span>
+          </button>
+          
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   );

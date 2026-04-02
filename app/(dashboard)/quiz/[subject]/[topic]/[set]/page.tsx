@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import { cn } from "@/lib/utils";
+import { QuestionCard } from "@/components/quiz/question-card";
+import { QuizSidebar } from "@/components/quiz/quiz-sidebar";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface QuizQuestion {
@@ -32,12 +33,6 @@ function toSlug(s: string) {
     .trim()
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 const QUIZ_DURATION = 15 * 60; // 15 minutes
@@ -252,63 +247,14 @@ export default function QuizSetPage() {
         {/* Main area */}
         <div className="flex-1 min-w-0">
           {/* Question card */}
-          <div className="bg-surface-container-lowest rounded-3xl p-8 md:p-10 shadow-lg shadow-primary/5 border border-primary/10 mb-6">
-            <div className="flex items-start gap-3 mb-8">
-              <span className="shrink-0 mt-0.5 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-headline font-bold text-sm">
-                {current + 1}
-              </span>
-              <h2 className="text-2xl font-hindi font-medium text-on-surface leading-relaxed">
-                {currentQ.question}
-              </h2>
-            </div>
-            <div className="space-y-3">
-              {currentQ.options.map((option, idx) => {
-                const isSelected = answers[current] === option;
-                const letter = ["A", "B", "C", "D"][idx];
-                return (
-                  <button
-                    key={idx}
-                    onClick={() =>
-                      setAnswers((prev) => ({ ...prev, [current]: option }))
-                    }
-                    className={cn(
-                      "group w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-150 ease-in-out cursor-pointer",
-                      isSelected
-                        ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
-                        : "border-surface-container hover:border-primary/40 hover:bg-surface-container/50",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-poppins font-bold text-sm transition-colors",
-                        isSelected
-                          ? "bg-primary text-white"
-                          : "bg-surface-container-low text-secondary group-hover:bg-primary/10 group-hover:text-primary",
-                      )}
-                    >
-                      {letter}
-                    </span>
-                    <span
-                      className={cn(
-                        "font-hindi text-xl font-medium leading-relaxed transition-colors",
-                        isSelected
-                          ? "text-primary"
-                          : "text-on-surface-variant group-hover:text-on-surface",
-                      )}
-                    >
-                      {option}
-                    </span>
-                    {isSelected && (
-                      <MaterialIcon
-                        name="check_circle"
-                        className="ml-auto text-primary text-lg shrink-0"
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <QuestionCard
+            currentQ={currentQ}
+            current={current}
+            answer={answers[current]}
+            onAnswerSelect={(cur, option) =>
+              setAnswers((prev) => ({ ...prev, [cur]: option }))
+            }
+          />
 
           {/* Navigation */}
           <div className="flex items-center justify-between pt-4 border-t border-outline-variant/20">
@@ -337,128 +283,19 @@ export default function QuizSetPage() {
         </div>
       </div>
 
-      {/* NEW local right sidebar */}
-      <aside className="w-80 h-screen fixed right-0 top-0 bg-surface-container-low border-l border-outline-variant/20 p-8 flex flex-col overflow-y-auto z-10 animate-in fade-in slide-in-from-right-4 duration-500 pt-10">
-        <h4 className="flex items-center gap-2 text-xs font-label font-bold text-secondary uppercase tracking-[0.15em] mb-6 mt-8">
-          <MaterialIcon name="timer" className="text-secondary" />
-          Quiz Status
-        </h4>
-
-        <div className="space-y-6 flex-1">
-          <div className="mb-6 space-y-2">
-            <h1 className="text-sm font-label font-bold text-secondary uppercase tracking-[0.15em]">
-              {labels.topic}
-            </h1>
-            <h2 className="text-sm font-headline font-extrabold text-on-surface">
-              {labels.set}
-            </h2>
-          </div>
-          {/* Metrics & Progress Card */}
-          <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 shadow-sm relative overflow-hidden">
-            {/* Soft background glow */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
-
-            <div className="grid grid-cols-2 gap-4 divide-x divide-outline-variant/10 mb-5 relative z-10">
-              {/* Timer */}
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block mb-1">
-                  Time Left
-                </span>
-                <div
-                  className={cn(
-                    "font-headline font-bold text-2xl tabular-nums mt-0.5",
-                    timerDanger
-                      ? "text-error animate-pulse"
-                      : "text-on-surface",
-                  )}
-                >
-                  {formatTime(timeLeft)}
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="pl-4">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block mb-1">
-                  Answered
-                </span>
-                <div className="font-headline font-bold text-2xl text-on-surface tabular-nums flex items-baseline gap-1 mt-0.5">
-                  <span className="text-primary">{answeredCount}</span>
-                  <span className="text-sm text-secondary font-medium">
-                    / {questions.length}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="pt-4 border-t border-outline-variant/10 relative z-10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary block">
-                  Progress
-                </span>
-                <span className="text-[10px] font-bold text-secondary">
-                  {Math.round(progress)}%
-                </span>
-              </div>
-              <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-500 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Palette */}
-          <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-secondary mb-4">
-              Question Palette
-            </p>
-            <div className="grid grid-cols-5 gap-1.5">
-              {questions.map((_, i) => {
-                const isAnswered = answers[i] !== undefined;
-                const isCurrent = i === current;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => setCurrent(i)}
-                    className={cn(
-                      "w-full aspect-square rounded-lg text-xs font-bold transition-all",
-                      isCurrent
-                        ? "bg-primary text-white ring-2 ring-primary/30 scale-110"
-                        : isAnswered
-                          ? "bg-primary/15 text-primary hover:bg-primary/25"
-                          : "bg-surface-container text-secondary hover:bg-surface-container-high",
-                    )}
-                  >
-                    {i + 1}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <button
-          id="btn-submit"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="mt-6 w-full flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-40 transition-all font-headline"
-        >
-          {isSubmitting ? (
-            <>
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Submitting…
-            </>
-          ) : (
-            <>
-              Submit Quiz
-              <MaterialIcon name="check_circle" className="text-lg" />
-            </>
-          )}
-        </button>
-      </aside>
+      <QuizSidebar
+        labels={labels}
+        timeLeft={timeLeft}
+        timerDanger={timerDanger}
+        answeredCount={answeredCount}
+        totalQuestions={questions.length}
+        progress={progress}
+        current={current}
+        onPageChange={setCurrent}
+        answers={answers}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmit}
+      />
     </>
   );
 }

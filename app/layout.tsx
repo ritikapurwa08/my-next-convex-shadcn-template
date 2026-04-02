@@ -5,6 +5,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import "material-symbols/outlined.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 // 1. Inter Font Setup (For body and labels)
 const inter = Inter({
@@ -66,7 +67,16 @@ export default function RootLayout({
       )}
     >
       <body className="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen">
-        <ConvexClientProvider>{children}</ConvexClientProvider>
+        <ConvexClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </ConvexClientProvider>
       </body>
     </html>
   );
