@@ -35,7 +35,7 @@ export function HistoryStats({ chartData }: HistoryStatsProps) {
           Accuracy Trend
         </h3>
       </div>
-      <div className="h-64 w-full min-w-0">
+      <div className="h-72 w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <BarChart
             data={chartData}
@@ -44,27 +44,28 @@ export function HistoryStats({ chartData }: HistoryStatsProps) {
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
-              stroke="#e5e7eb"
+              stroke="var(--outline-variant)"
               opacity={0.4}
             />
             <XAxis
               dataKey="name"
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 12, fill: "#6b7280" }}
+              tick={{ fontSize: 12, fill: "var(--secondary)" }}
               dy={10}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 12, fill: "#6b7280" }}
+              tick={{ fontSize: 12, fill: "var(--secondary)" }}
               domain={[0, 100]}
             />
             <Tooltip
-              cursor={{ fill: "#f3f4f6" }}
+              cursor={{ fill: "var(--surface-container)" }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
-                  const data = payload[0].payload as HistoryStatsProps["chartData"][0];
+                  const data = payload[0]
+                    .payload as HistoryStatsProps["chartData"][0];
                   return (
                     <div className="bg-surface-container-lowest p-3 border border-outline-variant/20 rounded-xl shadow-lg">
                       <p className="font-bold text-sm text-on-surface">

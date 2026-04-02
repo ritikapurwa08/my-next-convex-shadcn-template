@@ -30,7 +30,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl flex flex-col py-8 px-4 gap-y-2 z-50">
+    <aside className="h-screen w-64 fixed left-0 top-0 bg-slate-50/80 dark:bg-black backdrop-blur-xl flex flex-col py-8 px-4 gap-y-2 z-50">
       {/* Logo */}
       <div className="mb-10 px-2">
         <h1 className="text-xl font-headline font-extrabold tracking-tight text-blue-800 dark:text-blue-300">
@@ -83,7 +83,7 @@ export default function Sidebar() {
                 "flex items-center gap-x-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200",
                 pathname === "/admin/stored"
                   ? "text-blue-700 dark:text-blue-400 font-bold border-r-4 border-blue-700 bg-blue-50/50"
-                  : "text-slate-500 hover:text-blue-600 hover:bg-slate-200/50",
+                  : "text-slate-500 hover:text-slate-200/40 hover:bg-slate-600/30",
               )}
             >
               <MaterialIcon name="list_alt" />
@@ -134,7 +134,7 @@ export default function Sidebar() {
               {loggingOut ? "Logging out…" : "Logout"}
             </span>
           </button>
-          
+
           <ThemeToggle />
         </div>
       </div>
