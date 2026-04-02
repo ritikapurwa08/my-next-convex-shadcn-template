@@ -257,7 +257,7 @@ export default function QuizSetPage() {
               <span className="shrink-0 mt-0.5 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-headline font-bold text-sm">
                 {current + 1}
               </span>
-              <h2 className="text-xl font-hindi font-medium text-on-surface leading-relaxed">
+              <h2 className="text-2xl font-hindi font-medium text-on-surface leading-relaxed">
                 {currentQ.question}
               </h2>
             </div>
@@ -280,7 +280,7 @@ export default function QuizSetPage() {
                   >
                     <span
                       className={cn(
-                        "shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-hindi font-bold text-sm transition-colors",
+                        "shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-poppins font-bold text-sm transition-colors",
                         isSelected
                           ? "bg-primary text-white"
                           : "bg-surface-container-low text-secondary group-hover:bg-primary/10 group-hover:text-primary",
@@ -290,9 +290,9 @@ export default function QuizSetPage() {
                     </span>
                     <span
                       className={cn(
-                        "font-body text-sm leading-relaxed transition-colors",
+                        "font-hindi text-xl font-medium leading-relaxed transition-colors",
                         isSelected
-                          ? "text-primary "
+                          ? "text-primary"
                           : "text-on-surface-variant group-hover:text-on-surface",
                       )}
                     >

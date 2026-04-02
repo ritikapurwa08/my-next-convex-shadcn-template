@@ -12,6 +12,7 @@
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
   --font-hindi: var(--font-utsaah);
+  --font-poppins: var(--font-poppins);
 
   /* --- Design System Colors (MD3) --- */
   --color-on-primary-fixed-variant: #003dab;

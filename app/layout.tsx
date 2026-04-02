@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter, Manrope } from "next/font/google";
+import { Geist_Mono, Inter, Manrope, Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,13 @@ const utsaah = localFont({
   weight: "400",
 });
 
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["devanagari"],
+  display: "swap",
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "The Exam Orbit - Dashboard",
   description: "Academic Test Practice Platform",
@@ -54,7 +61,8 @@ export default function RootLayout({
         inter.variable,
         manrope.variable, // Added: This was missing, causing Manrope to not load!
         geistMono.variable,
-        utsaah.variable
+        utsaah.variable,
+        poppins.variable,
       )}
     >
       <body className="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen">
